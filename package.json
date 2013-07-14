@@ -1,0 +1,42 @@
+{
+  "name": "viff",
+  "description": "Find virtual differences between web pages in different environments(developing, staging, production) and browsers.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/winsonwq/viff",
+  "author": {
+    "name": "Wang Qiu",
+    "email": "winsonwq@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/windonwq/viff.git"
+  },
+  "bugs": {
+    "url": "https://github.com/windonwq/viff/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/windonwq/viff/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "lib/viff",
+  "engines": {
+    "node": "0.8.0"
+  },
+  "dependencies": {
+    "Mr.Async": "~0.3.1",
+    "underscore": "*",
+    "selenium-webdriver": ">=2.33.0",
+    "handlebars": "~1.0.12"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-jshint": "~0.1.1",
+    "grunt-contrib-watch": "~0.2.0",
+    "grunt-contrib-coffee": "~0.7.0",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "sinon": "*"
+  },
+  "keywords": ["testing", "viff"]
+}

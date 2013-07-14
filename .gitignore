@@ -1,0 +1,6 @@
+chromedriver.log
+
+/node_modules/
+/lib/
+/test/build/
+/tmp/
