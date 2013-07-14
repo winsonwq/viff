@@ -9,7 +9,7 @@ module.exports = function (webdriver){
       build: 'http://localhost:4000',
       prod: 'http://www.ishouldbeageek.me'
     },
-    paths: require('./links.js'),
+    paths: require('./links.js')(webdriver),
     reportFormat: 'html'
   }
 };
