@@ -38,5 +38,11 @@
     "grunt-contrib-nodeunit": "~0.2.0",
     "sinon": "*"
   },
-  "keywords": ["testing", "viff"]
+  "keywords": ["testing", "viff", "diff", "web", "e2e"],
+  "bin": {
+    "viff": "./bin/viff"
+  },
+  "scripts": {
+    "test": "npm install && grunt default"
+  }
 }
