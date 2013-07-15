@@ -6,19 +6,22 @@ Comparison = require './comparison'
 class Viff
   constructor: (seleniumHost) ->
     @builder = new webdriver.Builder().usingServer(seleniumHost)
+    @drivers = {}
 
   takeScreenshot: (browserName, envHost, url, callback) -> 
+    that = @
     defer = mr.Deferred()
     defer.done(callback)
     
-    @builder = @builder.withCapabilities { browserName: browserName }
-    driver = @builder.build()
+    unless driver = @drivers[browserName]
+      @builder = @builder.withCapabilities { browserName: browserName }
+      driver = @builder.build()
+      @drivers[browserName] = driver
 
     envName = _.first(envName for envName of envHost)
     driver.get envHost[envName] + url
 
     driver.takeScreenshot().then (base64Img) ->
-      driver.close()
       defer.resolve base64Img
 
     defer.promise()
@@ -51,6 +54,7 @@ class Viff
               returned++
 
             if returned == total
+              driver.close() for browserName, driver of that.drivers
               defer.resolve compares
           
     defer.promise()
