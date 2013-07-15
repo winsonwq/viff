@@ -43,7 +43,8 @@
     "viff": "./bin/viff"
   },
   "scripts": {
-    "postinstall": "./init.sh",
+    "build": "coffee -o ./lib/ -c src/*.coffee",
+    "install": "npm run build",
     "test": "npm install && grunt default"
   }
 }
