@@ -53,8 +53,10 @@ class Viff
               compares[browser][url] = new Comparison(envCompares)
               returned++
 
+            if _.isEqual links.length, _.keys(compares[browser]).length
+              that.drivers[browser].close()
+
             if returned == total
-              driver.close() for browserName, driver of that.drivers
               defer.resolve compares
           
     defer.promise()
