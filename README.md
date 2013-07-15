@@ -9,8 +9,9 @@ Find virtual differences between web pages in different environments(developing,
 Viff is running on selenium sever. Don't worry, you can easily set up selenium server by using [selenium-server-standalone.jar](https://code.google.com/p/selenium/downloads/detail?name=selenium-server-standalone-2.33.0.jar&can=2&q=). 
 
 ```
-npm install -g viff
+npm install -g coffee-script && npm install -g viff
 ```
+No need to install coffee-script if you have.
 
 # Example
 
@@ -67,7 +68,7 @@ viff ./build_prod.config.js -selenium-host http://localhost:4000/wd/hub
 ```
 Actually, these arguments like `-selenium-host` are optional. But if set, the inline configurations will override configurations in `.config.js` file. So `http://localhost:4000/wd/hub` will be in use.
 
-# Lisense
+# License
 
 Copyright (c) 2013 - 2016 Wang Qiu (winsonwq@gmail.com)
 
