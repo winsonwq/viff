@@ -43,7 +43,7 @@
     "viff": "./bin/viff"
   },
   "scripts": {
-    "install": "grunt coffee",
+    "postinstall": "./init.sh",
     "test": "npm install && grunt default"
   }
 }
