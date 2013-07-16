@@ -21,7 +21,7 @@ class Viff
     envName = _.first(envName for envName of envHost)
     driver.get envHost[envName] + url
 
-    driver.takeScreenshot().then (base64Img) ->
+    driver.takeScreenshot().then (base64Img) -> 
       defer.resolve base64Img
 
     defer.promise()
