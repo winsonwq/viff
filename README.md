@@ -68,6 +68,13 @@ viff ./build_prod.config.js -selenium-host http://localhost:4000/wd/hub
 ```
 Actually, these arguments like `-selenium-host` are optional. But if set, the inline configurations will override configurations in `.config.js` file. So `http://localhost:4000/wd/hub` will be in use.
 
+## html report example
+![html report example](http://ww2.sinaimg.cn/mw1024/64eae748tw1e6leimsy64j20rm0go0u6.jpg)
+
+# History
+
+2013-07-16 **viff@0.1.2**  support resizing images before finding diff
+
 # License
 
 Copyright (c) 2013 - 2016 Wang Qiu (winsonwq@gmail.com)
