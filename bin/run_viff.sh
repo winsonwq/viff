@@ -7,7 +7,7 @@ run_diff() {
   for file in ${arr[@]}; do
 
     name=`echo $file | cut -d '.' -f1`
-    convert "$name.png" -background white -alpha remove -resize 30% "$name.jpg"
+    convert "$name.png" -background white -alpha remove -resize 50% "$name.jpg"
     jpg_arr=(${jpg_arr[@]} "$name.jpg")
 
     if [ -f $file ]; then
