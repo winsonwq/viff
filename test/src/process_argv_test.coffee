@@ -1,5 +1,6 @@
 _ = require 'underscore'
 sinon = require 'sinon'
+path = require 'path'
 
 processArgv = require '../../lib/process.argv.js'
 
@@ -140,7 +141,7 @@ module.exports =
       '/Users/tw/Projects/viff/lib/index.js',
       '-envs', 
       'build=http://localhost:4000,prod=http://ishouldbeageek.me', 
-      '/Users/tw/Projects/viff/test/src/test.config.js',
+      path.join(__dirname, '../src/test.config.js'),
       '-paths', 
       '/404.html',
       '-selenium-host',
