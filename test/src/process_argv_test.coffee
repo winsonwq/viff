@@ -21,9 +21,9 @@ module.exports =
       'build=http://localhost:4000,prod=http://ishouldbeageek.me', 
       '-paths', 
       '/404.html',
-      '-report-format',
+      '--report-format',
       'html',
-      '-selenium-host',
+      '--selenium-host',
       'http://localhost:4444/wd/hub'
     ]
 
@@ -47,7 +47,7 @@ module.exports =
       'build=http://localhost:4000,prod=http://ishouldbeageek.me', 
       '-paths', 
       '/404.html',
-      '-selenium-host',
+      '--selenium-host',
       'http://localhost:4444/wd/hub'
     ]
 
@@ -65,7 +65,7 @@ module.exports =
       'build=http://localhost:4000,prod=http://ishouldbeageek.me', 
       '-paths', 
       '/404.html, ',
-      '-selenium-host',
+      '--selenium-host',
       'http://localhost:4444/wd/hub'
     ]
 
@@ -81,7 +81,7 @@ module.exports =
       'build=http://localhost:4000,prod=http://ishouldbeageek.me', 
       '-paths', 
       '/404.html, ',
-      '-selenium-host',
+      '--selenium-host',
       'http://localhost:4444/wd/hub'
     ]
 
@@ -89,7 +89,7 @@ module.exports =
     test.ok _.isEqual config.browsers, ['firefox']
     test.done()
 
-  'it should set default report format "html" when no -report-format': (test) ->
+  'it should set default report format "html" when no --report-format': (test) ->
     argv = [ 
       'node', 
       '/Users/tw/Projects/viff/lib/index.js',
@@ -97,7 +97,7 @@ module.exports =
       'build=http://localhost:4000,prod=http://ishouldbeageek.me', 
       '-paths', 
       '/404.html, ',
-      '-selenium-host',
+      '--selenium-host',
       'http://localhost:4444/wd/hub'
     ]
 
@@ -111,7 +111,7 @@ module.exports =
       '/Users/tw/Projects/viff/lib/index.js',
       '-paths', 
       '/404.html, ',
-      '-selenium-host',
+      '--selenium-host',
       'http://localhost:4444/wd/hub'
     ]
 
@@ -126,7 +126,7 @@ module.exports =
       '/Users/tw/Projects/viff/lib/index.js',
       '-envs', 
       'build=http://localhost:4000,prod=http://ishouldbeageek.me',
-      '-selenium-host',
+      '--selenium-host',
       'http://localhost:4444/wd/hub'
     ]
 
@@ -144,7 +144,7 @@ module.exports =
       path.join(__dirname, '../src/test.config.js'),
       '-paths', 
       '/404.html',
-      '-selenium-host',
+      '--selenium-host',
       'http://localhost:4444/wd/hub'
     ]
 

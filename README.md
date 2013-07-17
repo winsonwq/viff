@@ -24,7 +24,7 @@ java -jar ./selenium-server-standalone.jar -port 4444
 Run your task using inline command-line way. Viff web pages in different environments (build, prod) and browsers (firefox, chrome).
 
 ```
-viff -selenium-host http://localhost:4444/wd/hub -browsers "firefox,chrome" -envs build=http://localhost:4000,prod=http://ishouldbeageek.me -paths "/404.html,/page2" -report-format html > report.html
+viff --selenium-host http://localhost:4444/wd/hub -browsers "firefox,chrome" -envs build=http://localhost:4000,prod=http://ishouldbeageek.me -paths "/404.html,/page2" --report-format html > report.html
 ```
 
 If the paths that you want to test are so many. You could choose `xx.config.js` file.
@@ -64,9 +64,9 @@ module.exports = function (webdriver){
 Then, you could run
 
 ```
-viff ./build_prod.config.js -selenium-host http://localhost:4000/wd/hub
+viff ./build_prod.config.js --selenium-host http://localhost:4000/wd/hub
 ```
-Actually, these arguments like `-selenium-host` are optional. But if set, the inline configurations will override configurations in `.config.js` file. So `http://localhost:4000/wd/hub` will be in use.
+Actually, these arguments like `--selenium-host` are optional. But if set, the inline configurations will override configurations in `.config.js` file. So `http://localhost:4000/wd/hub` will be in use.
 
 ## html report example
 ![html report example](http://ww2.sinaimg.cn/mw1024/64eae748tw1e6leimsy64j20rm0go0u6.jpg)

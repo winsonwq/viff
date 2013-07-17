@@ -33,7 +33,7 @@ mergeAndValidateConfig = (seleniumHost, browsers, envHosts, paths, reportFormat,
   config.browsers = ['firefox'] if config.browsers is undefined or config.browsers.length == 0
   config.reportFormat = 'html' if reportFormat is undefined
 
-  throw new Error('-selenium-host isn\'t set correctly') if config.seleniumHost is undefined
+  throw new Error('--selenium-host isn\'t set correctly') if config.seleniumHost is undefined
   throw new Error('-envs aren\'t set correctly.') if config.envHosts is undefined or _.keys(config.envHosts).length < 2
   throw new Error('-paths aren\'t set correctly.') if config.paths is undefined or config.paths.length is 0
 
@@ -50,10 +50,10 @@ processArgv = (args) ->
       when '-paths'
         paths = parsePaths args.shift()
 
-      when '-report-format'
+      when '--report-format'
         reportFormat = args.shift().trim()
 
-      when '-selenium-host'
+      when '--selenium-host'
         seleniumHost = args.shift().trim()
 
       else
