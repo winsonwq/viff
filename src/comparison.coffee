@@ -24,7 +24,10 @@ class Comparison
 
     _.each @, (base64Img, env) ->
       filePath = path.join viffDir, newFileName()
-      fs.writeFileSync filePath, new Buffer(that[env], 'base64')
+      try
+        fs.writeFileSync filePath, new Buffer(that[env], 'base64')
+      catch ex
+        console.log ex
       filePaths.push filePath
 
     Comparison.convertAndCompare filePaths[0], filePaths[1], (diffPath) -> 
@@ -41,14 +44,20 @@ class Comparison
     envs = _.keys @
     envs.push 'DIFF'
 
-    for env, idx in envs
-      @[env] = fs.readFileSync(filePaths[idx], 'base64')
+    try
+      for env, idx in envs
+        @[env] = fs.readFileSync(filePaths[idx], 'base64')
+    catch ex
+      console.log ex
 
   @convertToFullFilePaths: (filePaths) ->
     fp.replace('.png', '.jpg') for fp in filePaths
 
   @clearFiles: (filePaths) ->
-    fs.unlinkSync fp for fp in filePaths
+    try
+      fs.unlinkSync fp for fp in filePaths
+    catch ex
+      console.log ex
 
   @convertAndCompare: (filePathA, filePathB, callback) ->
     defer = mr.Deferred()
