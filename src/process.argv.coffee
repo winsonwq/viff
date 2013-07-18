@@ -22,22 +22,19 @@ parsePaths = (value) ->
   _.select value.split(','), (path) -> !_.isEmpty(path.trim())
 
 mergeAndValidateConfig = (seleniumHost, browsers, envHosts, paths, reportFormat, config) ->
-  config = _.extend config || {}, {
-    seleniumHost: seleniumHost,
-    browsers: browsers,
-    envHosts: envHosts,
-    paths: paths,
-    reportFormat: reportFormat
-  }
+  c = config || {}
+  
+  for name, idx in ['seleniumHost', 'browsers', 'envHosts', 'paths', 'reportFormat']
+    c[name] = arguments[idx] || c[name]
 
-  config.browsers = ['firefox'] if config.browsers is undefined or config.browsers.length == 0
-  config.reportFormat = 'html' if reportFormat is undefined
+  c.browsers = ['firefox'] if c.browsers is undefined or c.browsers.length == 0
+  c.reportFormat = 'html' if c.reportFormat is undefined
+  
+  throw new Error('--selenium-host isn\'t set correctly') if c.seleniumHost is undefined
+  throw new Error('-envs aren\'t set correctly.') if c.envHosts is undefined or _.keys(c.envHosts).length < 2
+  throw new Error('-paths aren\'t set correctly.') if c.paths is undefined or c.paths.length is 0
 
-  throw new Error('--selenium-host isn\'t set correctly') if config.seleniumHost is undefined
-  throw new Error('-envs aren\'t set correctly.') if config.envHosts is undefined or _.keys(config.envHosts).length < 2
-  throw new Error('-paths aren\'t set correctly.') if config.paths is undefined or config.paths.length is 0
-
-  config
+  c
 
 processArgv = (args) ->
   while arg = args.shift()

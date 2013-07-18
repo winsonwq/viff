@@ -1,10 +1,10 @@
 'use strict'
 
-module.exports = function (driver) {
+module.exports = (function initLinks() {
 
   return [
     '/404.html',
     '/'
   ];
 
-};
+})();

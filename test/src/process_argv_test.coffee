@@ -135,7 +135,7 @@ module.exports =
 
     test.done()
 
-  'it will overide configuration when set custom.config.js and args at same time': (test) ->
+  'it will override configuration when set custom.config.js and args at same time': (test) ->
     argv = [ 
       'node', 
       '/Users/tw/Projects/viff/lib/index.js',
@@ -150,10 +150,26 @@ module.exports =
 
     config = processArgv argv
 
-    test.ok _.isEqual config.browsers, ['firefox']
+    test.ok _.isEqual config.browsers, ['safari']
     test.ok _.isEqual config.envHosts, { build: 'http://localhost:4000', prod: 'http://ishouldbeageek.me' }
     test.ok _.isEqual config.paths, ['/404.html']
-    test.ok _.isEqual config.reportFormat, 'html'
+    test.ok _.isEqual config.reportFormat, 'json'
+    test.done()
+
+  'it will override configuration when only use custom.config.js': (test) ->
+    argv = [ 
+      'node', 
+      '/Users/tw/Projects/viff/lib/index.js',
+      path.join(__dirname, '../src/correct.config.js')
+    ]
+
+    config = processArgv argv
+
+    test.ok _.isEqual config.browsers, ['safari', 'firefox']
+    test.ok _.isEqual config.envHosts, { custom: 'http://localhost:4000', custom2: 'http://localhost:4001' }
+    test.ok _.isEqual config.paths, ['/strict-mode']
+    test.ok _.isEqual config.reportFormat, 'json'
+
     test.done()
 
 
