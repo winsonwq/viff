@@ -33,32 +33,28 @@ If the paths that you want to test are so many. You could choose `xx.config.js` 
 // links.js
 'use strict'
 
-module.exports = function (webdriver) {
-  return [
-    '/404.html',
-    '/',
-    '/page2',
-    '/page3',
-    '/page4',
-    '/page5',
-    '/strict-mode'
-  ];
-};
+module.exports = [
+  '/404.html',
+  '/',
+  '/page2',
+  '/page3',
+  '/page4',
+  '/page5',
+  '/strict-mode'
+];
 
 // build_prod.config.js
 'use strict'
 
-module.exports = function (webdriver){
-  return {
-    seleniumHost: 'http://localhost:4444/wd/hub',
-    browsers: ['firefox', 'chrome', 'safari', 'opera'],
-    envHosts: {
-      build: 'http://localhost:4000',
-      prod: 'http://www.ishouldbeageek.me'
-    },
-    paths: require('./links.js')(webdriver),
-    reportFormat: 'html'
-  }
+module.exports = {
+  seleniumHost: 'http://localhost:4444/wd/hub',
+  browsers: ['firefox', 'chrome', 'safari', 'opera'],
+  envHosts: {
+    build: 'http://localhost:4000',
+    prod: 'http://www.ishouldbeageek.me'
+  },
+  paths: require('./links.js'),
+  reportFormat: 'html'
 };
 ```
 Then, you could run
