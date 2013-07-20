@@ -19,8 +19,10 @@ class Viff
       @drivers[browserName] = driver
 
     envName = _.first(envName for envName of envHost)
-    driver.get envHost[envName] + url
+    [url, preHandle] = url if _.isArray url
 
+    driver.get envHost[envName] + url
+    preHandle driver, webdriver if _.isFunction preHandle
     driver.takeScreenshot().then (base64Img) -> 
       defer.resolve base64Img
 
@@ -39,6 +41,7 @@ class Viff
       compares[browser] = compares[browser] || {}
       
       _.each links, (url) ->
+        url = _.first url if _.isFunction url[1]
         envCompares = {}
 
         _.each envHosts, (host, env) ->
