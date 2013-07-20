@@ -1,6 +1,7 @@
 Viff = require '../../lib/viff.js'
 sinon = require 'sinon'
 _ = require 'underscore'
+webdriver = require 'selenium-webdriver'
 
 module.exports = 
   setUp: (callback) ->
@@ -64,6 +65,25 @@ module.exports =
 
     test.ok callback.calledWith 'base64string'
     test.done()
+
+  'it should invoke pre handler before take screenshot': (test) ->
+    envHost = 
+      build: 'http://localhost:4000'
+
+    preHandler = sinon.spy()
+
+    link = ['/path', preHandler]
+    @viff.takeScreenshot('firefox', envHost, link)
+
+    test.ok preHandler.calledWith @driver, webdriver
+    test.done()
+
+  'it should use correct path when set pre handler': (test) ->
+    links = [['/404.html', (driver, webdriver) -> ]]
+    callback = (compares) -> 
+      test.equals _.first(_.keys(compares.firefox)), '/404.html'
+      test.done()
+    @viff.takeScreenshots @config.browsers, @config.compare, links, callback
 
   'it should take many screenshots according to config': (test) ->
     format = 
