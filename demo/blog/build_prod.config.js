@@ -2,10 +2,10 @@
 
 module.exports = {
     seleniumHost: 'http://localhost:4444/wd/hub',
-    browsers: ['firefox', 'safari'],
+    browsers: ['firefox'],
     envHosts: {
       build: 'http://localhost:4000',
-      prod: 'http://www.ishouldbeageek.me'
+      prod: 'http://ishouldbeageek.me'
     },
     paths: require('./links.js'),
     reportFormat: 'html'

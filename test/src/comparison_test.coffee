@@ -11,20 +11,18 @@ module.exports =
       build: 'abcd'
       prod: 'efgh'
 
+    @diffObj = 
+      getImageDataUrl: () ->
+        'ABCD'
+
     @comparison = new Comparison @imgWithEnvs
 
-    sinon.stub(Comparison, 'convertAndCompare').callsArgWith 2, '/diffPath'
-    sinon.stub(fs, 'readFileSync').returns('base64String')
-    sinon.stub(fs, 'unlinkSync').returns undefined
-    sinon.stub(fs, 'writeFileSync').returns undefined
+    sinon.stub(Comparison, 'compare').callsArgWith 2, @diffObj
 
     callback()
   tearDown: (callback) ->
     method.restore() for method in [
-      Comparison.convertAndCompare
-      fs.readFileSync 
-      fs.unlinkSync
-      fs.writeFileSync
+      Comparison.compare
     ]
 
     callback()
@@ -40,19 +38,6 @@ module.exports =
     @comparison.diff callback
 
     test.ok callback.calledOnce
-    test.equals @comparison.DIFF, 'base64String'
-    test.done()
-
-  'it should convert to correct .jpg file paths': (test) ->
-    fullFilePaths = Comparison.convertToFullFilePaths ['a.png', 'b.png', 'c.png']
-    test.ok _.isEqual fullFilePaths, ['a.jpg', 'b.jpg', 'c.jpg']
-    test.done()
-
-  'it should reload from new file paths': (test) ->
-    newFilesPaths = ['a.png', 'b.png', 'c.png']
-    @comparison.reloadFromPaths newFilesPaths
-    test.equals @comparison.build, 'base64String'
-    test.equals @comparison.prod, 'base64String'
-    test.equals @comparison.DIFF, 'base64String'
+    test.equals @comparison.DIFF, 'ABCD'
     test.done()
 

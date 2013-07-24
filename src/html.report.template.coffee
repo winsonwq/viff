@@ -12,7 +12,7 @@ template = """
       body{margin: 20px;}
       h2{font-size: 3em;}
       ul{overflow: hidden;}
-      li{list-style-type: none; margin-bottom: 20px; overflow: hidden;float:left;width:360px;}
+      li{list-style-type: none; margin-bottom: 20px; overflow: hidden;}
       a {float: left;height: 100px;width: 100px; overflow: hidden; margin-right:1%; position: relative;}
       a:before {
         content: attr(data-env);
