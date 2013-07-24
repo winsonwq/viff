@@ -71,6 +71,8 @@ Actually, these arguments like `--selenium-host` are optional. But if set, the i
 
 # History
 
+2013-07-24 **viff@0.2.0**  use [resemble.js](https://github.com/Huddle/Resemble.js) to replace imagemagick
+
 2013-07-16 **viff@0.1.2**  support resizing images before finding diff
 
 # License
