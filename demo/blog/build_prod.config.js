@@ -2,10 +2,10 @@
 
 module.exports = {
     seleniumHost: 'http://localhost:4444/wd/hub',
-    browsers: ['phantomjs'],
+    browsers: ['firefox'],
     envHosts: {
-      build: 'http://suncorpbank.com.au',
-      prod: 'http://suncorpbank.com.au'
+      build: 'http://localhost:4000',
+      prod: 'http://ishouldbeageek.me'
     },
     paths: require('./links.js'),
     reportFormat: 'html'
