@@ -3,13 +3,7 @@ _ = require 'underscore'
 mr = require 'Mr.Async'
 spawn = require('child_process').spawn
 fs = require('fs')
-
-runDiffPath = path.join __dirname, '../bin/run_viff.sh'
-
-viffDir = path.join path.dirname(__dirname), 'tmp'
-fs.mkdirSync viffDir unless fs.existsSync viffDir
-
-newFileName = -> new Date().getTime() + (Math.random(1) * Math.random(1)).toFixed(2) * 100 + '.png'
+resemble = require('resemble').resemble
 
 class Comparison
   constructor: (imgWithEnvs) ->
@@ -19,64 +13,23 @@ class Comparison
     defer = mr.Deferred()
     defer.done callback
 
-    filePaths = []
     that = @
+    fileData = _.map _.values(@), (base64Img) ->
+      new Buffer base64Img, 'base64'
 
-    _.each @, (base64Img, env) ->
-      filePath = path.join viffDir, newFileName()
-      try
-        fs.writeFileSync filePath, new Buffer(that[env], 'base64')
-      catch ex
-        console.log ex
-      filePaths.push filePath
-
-    Comparison.convertAndCompare filePaths[0], filePaths[1], (diffPath) -> 
-      if diffPath
-        fullFilePaths = Comparison.convertToFullFilePaths _.union filePaths, [diffPath]
-        
-        that.reloadFromPaths fullFilePaths
+    Comparison.compare fileData[0], fileData[1], (diffObj) -> 
+      if diffObj
+        that.DIFF = diffObj.getImageDataUrl().replace('data:image/png;base64,', '')
         defer.resolve that.DIFF
-        Comparison.clearFiles fullFilePaths
 
     defer.promise()
 
-  reloadFromPaths: (filePaths) ->
-    envs = _.keys @
-    envs.push 'DIFF'
-
-    try
-      for env, idx in envs
-        @[env] = fs.readFileSync(filePaths[idx], 'base64')
-    catch ex
-      console.log ex
-
-  @convertToFullFilePaths: (filePaths) ->
-    fp.replace('.png', '.jpg') for fp in filePaths
-
-  @clearFiles: (filePaths) ->
-    try
-      fs.unlinkSync fp for fp in filePaths
-    catch ex
-      console.log ex
-
-  @convertAndCompare: (filePathA, filePathB, callback) ->
+  @compare: (fileAData, fileBData, callback) ->
     defer = mr.Deferred()
     defer.done callback
 
-    outputFilePath = path.join viffDir, newFileName()
-    runDiff = spawn runDiffPath, [filePathA, filePathB, outputFilePath]
-
-    runDiff.stdout.on 'data', (data) -> 
-      console.log 'stdout: ' + data
-
-    runDiff.stderr.on 'data', (data) -> 
-      console.log 'stderr: ' + data
-
-    runDiff.on 'close', (code) ->
-      if code == 0
-        defer.resolve outputFilePath
-      else
-        defer.reject()
+    resemble(fileAData).compareTo(fileBData).onComplete (data) ->
+      defer.resolve data
 
     defer.promise()
 
