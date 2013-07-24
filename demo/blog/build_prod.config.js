@@ -2,7 +2,7 @@
 
 module.exports = {
     seleniumHost: 'http://localhost:4444/wd/hub',
-    browsers: ['firefox'],
+    browsers: ['phantomjs'],
     envHosts: {
       build: 'http://suncorpbank.com.au',
       prod: 'http://suncorpbank.com.au'

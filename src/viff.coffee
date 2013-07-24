@@ -41,7 +41,8 @@ class Viff
       compares[browser] = compares[browser] || {}
       
       _.each links, (url) ->
-        url = _.first url if _.isFunction url[1]
+        path = url
+        path = _.first url if _.isArray url
         envCompares = {}
 
         _.each envHosts, (host, env) ->
@@ -53,7 +54,7 @@ class Viff
             _.extend(envCompares, envHost)
 
             if _.isEqual _.keys(envCompares), _.keys(envHosts)
-              compares[browser][url] = new Comparison(envCompares)
+              compares[browser][path] = new Comparison(envCompares)
               returned++
 
             if _.isEqual links.length, _.keys(compares[browser]).length

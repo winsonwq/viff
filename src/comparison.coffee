@@ -5,8 +5,6 @@ spawn = require('child_process').spawn
 fs = require('fs')
 resemble = require('resemble').resemble
 
-newFileName = -> new Date().getTime() + (Math.random(1) * Math.random(1)).toFixed(2) * 100 + '.png'
-
 class Comparison
   constructor: (imgWithEnvs) ->
     _.extend(@, imgWithEnvs)
