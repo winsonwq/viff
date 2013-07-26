@@ -28,10 +28,12 @@ module.exports = function(grunt) {
           'lib/reporter.js': 'src/reporter.coffee',
           'lib/html.report.template.js': 'src/html.report.template.coffee',
           'lib/process.argv.js': 'src/process.argv.coffee',
+          'lib/image.generator.js': 'src/image.generator.coffee',
           'test/build/comparison_test.js': 'test/src/comparison_test.coffee',
           'test/build/viff_test.js': 'test/src/viff_test.coffee',
           'test/build/reporter_test.js': 'test/src/reporter_test.coffee',
-          'test/build/process_argv_test.js': 'test/src/process_argv_test.coffee'
+          'test/build/process_argv_test.js': 'test/src/process_argv_test.coffee',
+          'test/build/image_generator_test.js': 'test/src/image_generator_test.coffee'
         }
       }
     },
