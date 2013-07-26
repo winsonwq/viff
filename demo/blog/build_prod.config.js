@@ -2,7 +2,7 @@
 
 module.exports = {
     seleniumHost: 'http://localhost:4444/wd/hub',
-    browsers: ['firefox'],
+    browsers: ['firefox', 'safari', 'chrome', 'opera'],
     envHosts: {
       build: 'http://localhost:4000',
       prod: 'http://ishouldbeageek.me'

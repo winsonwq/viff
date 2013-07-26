@@ -1,7 +1,6 @@
 path = require 'path'
 _ = require 'underscore'
 mr = require 'Mr.Async'
-spawn = require('child_process').spawn
 fs = require('fs')
 resemble = require('resemble').resemble
 

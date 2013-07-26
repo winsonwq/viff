@@ -29,7 +29,8 @@
     "underscore": "*",
     "selenium-webdriver": ">=2.33.0",
     "handlebars": "~1.0.12", 
-    "resemble": "~1.0.3"
+    "resemble": "~1.0.3",
+    "wrench": "*"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
