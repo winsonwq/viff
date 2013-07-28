@@ -42,8 +42,8 @@ template = """
     <ul>
       {{#each this}}
       <li>
-        <h3>{{@key}}</h3>
-        {{#each this}}
+        <h3>{{@key}} {{this.analysisTime}}ms</h3>
+        {{#each this.images}}
         <a href="data:image/png;base64,{{this}}" data-env="{{@key}}">
           <img src="data:image/png;base64,{{this}}"/>
         </a>

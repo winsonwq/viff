@@ -7,20 +7,25 @@ resemble = require('resemble').resemble
 
 class Comparison
   constructor: (imgWithEnvs) ->
-    _.extend(@, imgWithEnvs)
+    @images = imgWithEnvs
 
   diff: (callback) ->
     defer = mr.Deferred()
     defer.done callback
 
     that = @
-    fileData = _.map _.values(@), (base64Img) ->
+    fileData = _.map _.values(@images), (base64Img) ->
       new Buffer base64Img, 'base64'
 
     Comparison.compare fileData[0], fileData[1], (diffObj) -> 
       if diffObj
-        that.DIFF = diffObj.getImageDataUrl().replace('data:image/png;base64,', '')
-        defer.resolve that.DIFF
+        that.images.diff = diffObj.getImageDataUrl().replace('data:image/png;base64,', '')
+        _.extend that, 
+          isSameDimensions: diffObj.isSameDimensions
+          misMatchPercentage: Number diffObj.misMatchPercentage    
+          analysisTime: diffObj.analysisTime
+
+        defer.resolve that.images.diff
 
     defer.promise()
 
