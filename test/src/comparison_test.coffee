@@ -11,7 +11,10 @@ module.exports =
       build: 'abcd'
       prod: 'efgh'
 
-    @diffObj = 
+    @diffObj =
+      isSameDimensions: true
+      misMatchPercentage: "2.84"
+      analysisTime: 54
       getImageDataUrl: () ->
         'ABCD'
 
@@ -28,8 +31,8 @@ module.exports =
     callback()
 
   'it should have correct properties': (test) ->
-    test.equals @comparison.build, 'abcd'
-    test.equals @comparison.prod, 'efgh'
+    test.equals @comparison.images.build, 'abcd'
+    test.equals @comparison.images.prod, 'efgh'
     
     test.done()
 
@@ -38,6 +41,13 @@ module.exports =
     @comparison.diff callback
 
     test.ok callback.calledOnce
-    test.equals @comparison.DIFF, 'ABCD'
+    test.equals @comparison.images.diff, 'ABCD'
     test.done()
+
+  'it should get correct diff property': (test) ->
+    @comparison.diff =>
+      test.ok @comparison.isSameDimensions
+      test.strictEqual @comparison.misMatchPercentage, 2.84
+      test.equals @comparison.analysisTime, 54
+      test.done()
 

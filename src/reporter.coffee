@@ -1,11 +1,39 @@
+_ = require 'underscore'
 handlebars = require 'handlebars'
 template = require('./html.report.template.js')
 
 render = handlebars.compile template
 
-reporter = 
-  generate: (format, data) ->
-    return render { compares: data } if format is 'html'
-    return JSON.stringify(data) if format is 'json'
+class Reporter
+  constructor: (@compares) ->
+    @cases = []
+    @differences = []
+    @totalAnalysisTime = 0
 
-module.exports = reporter
+    for browser, urls of @compares
+      for url, diff of urls
+        diffCase = {}
+        diffCase[url] = diff
+
+        @cases.push diffCase
+        @differences.push(diffCase) if diff.misMatchPercentage isnt 0
+        @totalAnalysisTime += diff.analysisTime
+
+    @caseCount = @cases.length
+    @diffCount = @differences.length
+
+  to: (format = 'html') ->
+    if format is 'html'
+      renderObj = 
+        compares: @compares
+        caseCount: @caseCount
+        sameCount: @caseCount - @diffCount
+        diffCount: @diffCount
+        totalAnalysisTime: @totalAnalysisTime 
+      
+      render renderObj
+
+    else if format is 'json'
+      JSON.stringify(@compares)
+
+module.exports = Reporter
