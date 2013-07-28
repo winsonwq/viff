@@ -10,7 +10,8 @@ template = """
       body{font: normal normal 14px/1.5 'Open Sans', sans-serif; }
       body,ul,h1,h2,h3,h4{margin:0;padding:0;font-weight:300;font-style:normal;}
       body{margin: 20px;}
-      h2{font-size: 3em;}
+      h1{font-size: 3em;}
+      h2{font-size: 2.4em;}
       ul{overflow: hidden;}
       li{list-style-type: none; margin-bottom: 20px; overflow: hidden;}
       a {float: left;height: 100px;width: 100px; overflow: hidden; margin-right:1%; position: relative;}
@@ -37,12 +38,13 @@ template = """
     </style>
   </head>
   <body>
+    <h1>Viff Report - ({{sameCount}} same in {{caseCount}} cases) {{totalAnalysisTime}}ms</h1>
     {{#each compares}}
     <h2>{{@key}}</h2>
     <ul>
       {{#each this}}
       <li>
-        <h3>{{@key}} {{this.analysisTime}}ms</h3>
+        <h3>{{@key}} - {{this.misMatchPercentage}}% mismatch {{this.analysisTime}}ms</h3>
         {{#each this.images}}
         <a href="data:image/png;base64,{{this}}" data-env="{{@key}}">
           <img src="data:image/png;base64,{{this}}"/>
