@@ -49,7 +49,7 @@ module.exports =
       caseCount: 3
       sameCount: 2
       diffCount: 1
-      totalAnalysisTime: 210 
+      totalAnalysisTime: 210
 
     @mkdirSync = sinon.stub(fs, 'mkdirSync').returns 1
     @existsSync = sinon.stub(fs, 'existsSync').returns true
@@ -109,5 +109,6 @@ module.exports =
     ImageGenerator.generate @reporterObj
     parsedCompares = JSON.parse @writeFileSync.lastCall.args[1]
     test.equals parsedCompares.compares.firefox['/404.html?a=1'].images.build, 'screenshots/firefox/%2F404.html%3Fa%3D1/build.png'
+
     test.done()
 
