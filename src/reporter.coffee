@@ -1,6 +1,7 @@
 _ = require 'underscore'
 handlebars = require 'handlebars'
 template = require('./html.report.template.js')
+ImageGenerator = require('./image.generator.js')
 
 render = handlebars.compile template
 
@@ -23,17 +24,16 @@ class Reporter
     @diffCount = @differences.length
 
   to: (format = 'html') ->
-    if format is 'html'
-      renderObj = 
-        compares: @compares
-        caseCount: @caseCount
-        sameCount: @caseCount - @diffCount
-        diffCount: @diffCount
-        totalAnalysisTime: @totalAnalysisTime 
-      
-      render renderObj
+    reportObj = 
+      compares: @compares
+      caseCount: @caseCount
+      sameCount: @caseCount - @diffCount
+      diffCount: @diffCount
+      totalAnalysisTime: @totalAnalysisTime 
 
-    else if format is 'json'
-      JSON.stringify(@compares)
+    return render reportObj if format is 'html'
+    return JSON.stringify(reportObj) if format is 'json'
+    ImageGenerator.generate reportObj if format is 'file'
+
 
 module.exports = Reporter

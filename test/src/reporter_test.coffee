@@ -1,5 +1,7 @@
 _ = require 'underscore'
+sinon = require 'sinon'
 Reporter = require '../../lib/reporter.js'
+ImageGenerator = require '../../lib/image.generator.js'
 
 module.exports = 
   setUp: (callback) ->
@@ -71,7 +73,18 @@ module.exports =
     jsonStr = new Reporter(@compares).to 'json'
     json = JSON.parse jsonStr
 
-    test.ok _.isEqual _.keys(json), ['chrome', 'firefox']
-    test.ok _.isEqual _.keys(json.chrome['/404.html'].images), ['build', 'prod']
-    test.ok _.isEqual _.values(json.chrome['/404.html'].images), ['aaa', 'bbb']
+    test.equals json.caseCount, 4
+    test.equals json.diffCount, 3
+    test.equals json.totalAnalysisTime, 210
+    test.ok _.isEqual _.keys(json.compares), ['chrome', 'firefox']
+    test.ok _.isEqual _.keys(json.compares.chrome['/404.html'].images), ['build', 'prod']
+    test.ok _.isEqual _.values(json.compares.chrome['/404.html'].images), ['aaa', 'bbb']
+    test.done()
+
+  'it should generate correct file-based json': (test) ->
+    generate = sinon.stub(ImageGenerator, 'generate').returns 'undefined'
+    new Reporter(@compares).to 'file'
+
+    test.ok generate.calledOnce
+    test.equals generate.lastCall.args[0].compares, @compares
     test.done()
