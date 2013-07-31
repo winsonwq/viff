@@ -112,3 +112,28 @@ module.exports =
 
     test.done()
 
+  'it should fire create folder handler': (test) ->
+    createFolderCallback = sinon.spy()
+    ImageGenerator.on ImageGenerator.CREATE_FOLDER, createFolderCallback
+
+    ImageGenerator.generate @reporterObj
+    
+    test.ok createFolderCallback.getCall(0).args[0].indexOf('/screenshots') >= 0
+    test.ok createFolderCallback.getCall(1).args[0].indexOf('/screenshots/firefox') >= 0
+    test.ok createFolderCallback.getCall(3).args[0].indexOf('/screenshots/firefox/%2F') >= 0
+    test.ok createFolderCallback.getCall(5).args[0].indexOf('/screenshots/chrome/%2F404.html') >= 0
+
+    test.done()
+
+  'it should fire create file handler': (test) ->
+    createFileCallback = sinon.spy()
+    ImageGenerator.on ImageGenerator.CREATE_FILE, createFileCallback
+
+    ImageGenerator.generate @reporterObj
+
+    test.equals createFileCallback.callCount, 13
+    test.ok createFileCallback.getCall(0).args[0].indexOf('/screenshots/firefox/%2F404.html%3Fa%3D1/build.png') >= 0
+    test.ok createFileCallback.getCall(6).args[0].indexOf('/screenshots/chrome/%2F404.html/build.png') >= 0
+    test.ok createFileCallback.lastCall.args[0].indexOf('/report.json') >= 0
+    test.done()
+

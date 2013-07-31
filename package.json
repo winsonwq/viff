@@ -30,7 +30,8 @@
     "selenium-webdriver": ">=2.33.0",
     "handlebars": "~1.0.12", 
     "resemble": "~1.0.3",
-    "wrench": "*"
+    "wrench": "*",
+    "colors": "*"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

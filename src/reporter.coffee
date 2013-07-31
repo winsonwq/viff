@@ -1,9 +1,15 @@
 _ = require 'underscore'
 handlebars = require 'handlebars'
-template = require('./html.report.template.js')
-ImageGenerator = require('./image.generator.js')
+colors = require 'colors'
+template = require './html.report.template.js'
+ImageGenerator = require './image.generator.js'
 
 render = handlebars.compile template
+
+colors.setTheme 
+  info: 'green'
+  prompt: 'magenta'
+  greyColor: 'grey'
 
 class Reporter
   constructor: (@compares) ->
@@ -33,7 +39,16 @@ class Reporter
 
     return render reportObj if format is 'html'
     return JSON.stringify(reportObj) if format is 'json'
-    ImageGenerator.generate reportObj if format is 'file'
+
+    if format is 'file'
+      ImageGenerator.on ImageGenerator.CREATE_FOLDER, (folerPath) ->
+        console.log "#{ 'viff'.greyColor } #{ 'create'.info } #{ 'folder'.prompt } #{folerPath}"
+
+      ImageGenerator.on ImageGenerator.CREATE_FILE, (filePath) ->
+        console.log "#{ 'viff'.greyColor } #{ 'create'.info } #{ ' file '.prompt } #{filePath}"
+
+      ImageGenerator.generate reportObj
+      return ''
 
 
 module.exports = Reporter
