@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <title>Viff by winsonwq</title>
+  </head>
+
+  <body>
+    <header>
+      <div class="inner">
+        <h1>Viff</h1>
+        <h2>Find virtual differences between web pages in different environments(developing, staging, production) and browsers.</h2>
+        <a href="https://github.com/winsonwq/viff" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="viff" class="anchor" href="#viff"><span class="octicon octicon-link"></span></a>Viff</h1>
+
+<p>version <strong><em>Alpha</em></strong></p>
+
+<p>Find virtual differences between web pages in different environments(developing, staging, production) and browsers.</p>
+
+<h1>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h1>
+
+<p>Viff is running on selenium sever. Don't worry, you can easily set up selenium server by using <a href="https://code.google.com/p/selenium/downloads/detail?name=selenium-server-standalone-2.33.0.jar&amp;can=2&amp;q=">selenium-server-standalone.jar</a>. </p>
+
+<pre><code>npm install -g coffee-script &amp;&amp; npm install -g viff
+</code></pre>
+
+<p>No need to install coffee-script if you have.</p>
+
+<p>If you meet issue about <code>node-canvas</code>. Have a check <a href="https://github.com/LearnBoost/node-canvas/wiki/Installation---OSX">node-canvas wiki</a></p>
+
+<h1>
+<a name="example" class="anchor" href="#example"><span class="octicon octicon-link"></span></a>Example</h1>
+
+<p>Start server</p>
+
+<pre><code>java -jar ./selenium-server-standalone.jar -port 4444
+</code></pre>
+
+<p>Run your task using inline command-line way. Viff web pages in different environments (build, prod) and browsers (firefox, chrome).</p>
+
+<pre><code>viff --selenium-host http://localhost:4444/wd/hub -browsers "firefox,chrome" -envs build=http://localhost:4000,prod=http://ishouldbeageek.me -paths "/404.html,/page2" --report-format html &gt; report.html
+</code></pre>
+
+<p>If the paths that you want to test are so many. You could choose <code>xx.config.js</code> file.</p>
+
+<div class="highlight"><pre><span class="c1">// links.js</span>
+<span class="s1">'use strict'</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">[</span>
+  <span class="s1">'/404.html'</span><span class="p">,</span>
+  <span class="s1">'/'</span><span class="p">,</span>
+  <span class="s1">'/page2'</span><span class="p">,</span>
+  <span class="s1">'/page3'</span><span class="p">,</span>
+  <span class="s1">'/page4'</span><span class="p">,</span>
+  <span class="s1">'/page5'</span><span class="p">,</span>
+  <span class="s1">'/strict-mode'</span>
+<span class="p">];</span>
+
+<span class="c1">// build_prod.config.js</span>
+<span class="s1">'use strict'</span>
+
+<span class="nx">module</span><span class="p">.</span><span class="nx">exports</span> <span class="o">=</span> <span class="p">{</span>
+  <span class="nx">seleniumHost</span><span class="o">:</span> <span class="s1">'http://localhost:4444/wd/hub'</span><span class="p">,</span>
+  <span class="nx">browsers</span><span class="o">:</span> <span class="p">[</span><span class="s1">'firefox'</span><span class="p">,</span> <span class="s1">'chrome'</span><span class="p">,</span> <span class="s1">'safari'</span><span class="p">,</span> <span class="s1">'opera'</span><span class="p">],</span>
+  <span class="nx">envHosts</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">build</span><span class="o">:</span> <span class="s1">'http://localhost:4000'</span><span class="p">,</span>
+    <span class="nx">prod</span><span class="o">:</span> <span class="s1">'http://www.ishouldbeageek.me'</span>
+  <span class="p">},</span>
+  <span class="nx">paths</span><span class="o">:</span> <span class="nx">require</span><span class="p">(</span><span class="s1">'./links.js'</span><span class="p">),</span>
+  <span class="nx">reportFormat</span><span class="o">:</span> <span class="s1">'html'</span>
+<span class="p">};</span>
+</pre></div>
+
+<p>Then, you could run</p>
+
+<pre><code>viff ./build_prod.config.js --selenium-host http://localhost:4000/wd/hub
+</code></pre>
+
+<p>Actually, these arguments like <code>--selenium-host</code> are optional. But if set, the inline configurations will override configurations in <code>.config.js</code> file. So <code>http://localhost:4000/wd/hub</code> will be in use.</p>
+
+<h2>
+<a name="html-report-example" class="anchor" href="#html-report-example"><span class="octicon octicon-link"></span></a>html report example</h2>
+
+<p><img src="http://ww2.sinaimg.cn/mw1024/64eae748tw1e6leimsy64j20rm0go0u6.jpg" alt="html report example"></p>
+
+<h1>
+<a name="history" class="anchor" href="#history"><span class="octicon octicon-link"></span></a>History</h1>
+
+<p>2013-07-24 <strong>viff@0.2.0</strong>  use <a href="https://github.com/Huddle/Resemble.js">resemble.js</a> to replace imagemagick</p>
+
+<p>2013-07-16 <strong>viff@0.1.2</strong>  support resizing images before finding diff</p>
+
+<h1>
+<a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h1>
+
+<p>Copyright (c) 2013 - 2016 Wang Qiu (<a href="mailto:winsonwq@gmail.com">winsonwq@gmail.com</a>)</p>
+
+<p>Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:</p>
+
+<p>The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.</p>
+
+<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.</p>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/winsonwq/viff/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/winsonwq/viff/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/winsonwq/viff"></a> is maintained by <a href="https://github.com/winsonwq">winsonwq</a>.</p>
+
+          <p>This page was generated by <a href="pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
+    </div>
+
+  
+  </body>
+</html>
