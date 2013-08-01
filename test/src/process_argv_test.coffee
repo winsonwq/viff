@@ -141,7 +141,7 @@ module.exports =
       '/Users/tw/Projects/viff/lib/index.js',
       '-envs', 
       'build=http://localhost:4000,prod=http://ishouldbeageek.me', 
-      path.join(__dirname, '../src/test.config.js'),
+      './test/src/test.config.js',
       '-paths', 
       '/404.html',
       '--selenium-host',
@@ -160,7 +160,7 @@ module.exports =
     argv = [ 
       'node', 
       '/Users/tw/Projects/viff/lib/index.js',
-      path.join(__dirname, '../src/correct.config.js')
+      './test/src/correct.config.js'
     ]
 
     config = processArgv argv

@@ -1,4 +1,5 @@
 _ = require 'underscore'
+path = require 'path'
 
 parseBrowsers = (value) ->
   browsers = []
@@ -55,7 +56,8 @@ processArgv = (args) ->
 
       else
         if arg.indexOf('.config.js') > 0
-          config = require arg
+          config = require path.join path.dirname(__dirname), arg
+
 
   mergeAndValidateConfig seleniumHost, browsers, envHosts, paths, reportFormat, config
 
