@@ -8,6 +8,8 @@ EventEmitter = require('events').EventEmitter
 preprocessFolderName = (name) ->
   encodeURIComponent name
 
+currentRunningDirname = process.cwd()
+
 events = 
   CREATE_FOLDER: 'createFolder'
   CREATE_FILE: 'createFile'
@@ -44,7 +46,7 @@ _.extend ImageGenerator,
         _.each properties.images, (base64Img, env) ->
           imagePath = path.join(urlFolderPath, env + '.png')
           ImageGenerator.createImageFile imagePath, base64Img
-          properties.images[env] = path.relative path.dirname(__dirname), imagePath
+          properties.images[env] = path.relative path.dirname(currentRunningDirname), imagePath
 
   generateReportJsonFile: (reportJsonPath, reportObj) ->
     fs.writeFileSync reportJsonPath, JSON.stringify reportObj
@@ -54,8 +56,8 @@ _.extend ImageGenerator,
     throw new Error('compares cannot be null.') if reportObj is null
 
     reportObj = _.clone reportObj
-    screenshotPath = path.join __dirname, '../screenshots'
-    reportJsonPath = path.join __dirname, '../report.json'
+    screenshotPath = path.join currentRunningDirname, './screenshots'
+    reportJsonPath = path.join currentRunningDirname, './report.json'
 
     ImageGenerator.resetFolderAndFile screenshotPath, reportJsonPath
     ImageGenerator.generateFoldersAndImages screenshotPath, reportObj.compares

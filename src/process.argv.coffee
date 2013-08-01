@@ -56,7 +56,7 @@ processArgv = (args) ->
 
       else
         if arg.indexOf('.config.js') > 0
-          config = require path.join path.dirname(__dirname), arg
+          config = require path.resolve process.cwd(), arg
 
 
   mergeAndValidateConfig seleniumHost, browsers, envHosts, paths, reportFormat, config

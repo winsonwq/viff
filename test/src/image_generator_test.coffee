@@ -73,21 +73,21 @@ module.exports =
 
   'it should remove "screenshots" folder if exist': (test) ->
     ImageGenerator.generate @reporterObj
-    test.ok @rmdirSyncRecursive.lastCall.args[0].indexOf('/screenshots') >= 0
+    test.ok @rmdirSyncRecursive.lastCall.args[0].indexOf('/viff/screenshots') >= 0
 
     test.done()
 
   'it should remove report.json file if exist': (test) ->
     ImageGenerator.generate @reporterObj
-    test.ok @unlinkSync.lastCall.args[0].indexOf('/report.json') >= 0
+    test.ok @unlinkSync.lastCall.args[0].indexOf('/viff/report.json') >= 0
 
     test.done()
 
   'it should generate correct directories': (test) ->
     ImageGenerator.generate @reporterObj
     test.equals @mkdirSync.callCount, 6
-    test.ok @mkdirSync.getCall(1).args[0].indexOf('/screenshots/firefox/%2F404.html%3Fa%3D1') >= 0
-    test.ok @mkdirSync.getCall(3).args[0].indexOf('/screenshots/chrome') >= 0
+    test.ok @mkdirSync.getCall(1).args[0].indexOf('/viff/screenshots/firefox/%2F404.html%3Fa%3D1') >= 0
+    test.ok @mkdirSync.getCall(3).args[0].indexOf('/viff/screenshots/chrome') >= 0
     test.done()    
 
   'it should always create new "screenshots" folder': (test) ->
@@ -97,7 +97,7 @@ module.exports =
 
   'it should always create new report.json file': (test) ->
     ImageGenerator.generate @reporterObj
-    test.ok @writeFileSync.lastCall.args[0].indexOf('/report.json') >= 0
+    test.ok @writeFileSync.lastCall.args[0].indexOf('/viff/report.json') >= 0
     test.done()
 
   'it should generate correct images': (test) ->
@@ -108,7 +108,7 @@ module.exports =
   'it should generate file-based json file': (test) ->
     ImageGenerator.generate @reporterObj
     parsedCompares = JSON.parse @writeFileSync.lastCall.args[1]
-    test.equals parsedCompares.compares.firefox['/404.html?a=1'].images.build, 'screenshots/firefox/%2F404.html%3Fa%3D1/build.png'
+    test.equals parsedCompares.compares.firefox['/404.html?a=1'].images.build, 'viff/screenshots/firefox/%2F404.html%3Fa%3D1/build.png'
 
     test.done()
 
@@ -118,10 +118,10 @@ module.exports =
 
     ImageGenerator.generate @reporterObj
     
-    test.ok createFolderCallback.getCall(0).args[0].indexOf('/screenshots') >= 0
-    test.ok createFolderCallback.getCall(1).args[0].indexOf('/screenshots/firefox') >= 0
-    test.ok createFolderCallback.getCall(3).args[0].indexOf('/screenshots/firefox/%2F') >= 0
-    test.ok createFolderCallback.getCall(5).args[0].indexOf('/screenshots/chrome/%2F404.html') >= 0
+    test.ok createFolderCallback.getCall(0).args[0].indexOf('/viff/screenshots') >= 0
+    test.ok createFolderCallback.getCall(1).args[0].indexOf('/viff/screenshots/firefox') >= 0
+    test.ok createFolderCallback.getCall(3).args[0].indexOf('/viff/screenshots/firefox/%2F') >= 0
+    test.ok createFolderCallback.getCall(5).args[0].indexOf('/viff/screenshots/chrome/%2F404.html') >= 0
 
     test.done()
 
@@ -132,8 +132,8 @@ module.exports =
     ImageGenerator.generate @reporterObj
 
     test.equals createFileCallback.callCount, 13
-    test.ok createFileCallback.getCall(0).args[0].indexOf('/screenshots/firefox/%2F404.html%3Fa%3D1/build.png') >= 0
-    test.ok createFileCallback.getCall(6).args[0].indexOf('/screenshots/chrome/%2F404.html/build.png') >= 0
-    test.ok createFileCallback.lastCall.args[0].indexOf('/report.json') >= 0
+    test.ok createFileCallback.getCall(0).args[0].indexOf('/viff/screenshots/firefox/%2F404.html%3Fa%3D1/build.png') >= 0
+    test.ok createFileCallback.getCall(6).args[0].indexOf('/viff/screenshots/chrome/%2F404.html/build.png') >= 0
+    test.ok createFileCallback.lastCall.args[0].indexOf('/viff/report.json') >= 0
     test.done()
 
