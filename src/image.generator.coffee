@@ -46,7 +46,7 @@ _.extend ImageGenerator,
         _.each properties.images, (base64Img, env) ->
           imagePath = path.join(urlFolderPath, env + '.png')
           ImageGenerator.createImageFile imagePath, base64Img
-          properties.images[env] = path.relative path.dirname(currentRunningDirname), imagePath
+          properties.images[env] = path.relative currentRunningDirname, imagePath
 
   generateReportJsonFile: (reportJsonPath, reportObj) ->
     fs.writeFileSync reportJsonPath, JSON.stringify reportObj

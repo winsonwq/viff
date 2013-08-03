@@ -108,7 +108,7 @@ module.exports =
   'it should generate file-based json file': (test) ->
     ImageGenerator.generate @reporterObj
     parsedCompares = JSON.parse @writeFileSync.lastCall.args[1]
-    test.equals parsedCompares.compares.firefox['/404.html?a=1'].images.build, 'viff/screenshots/firefox/%2F404.html%3Fa%3D1/build.png'
+    test.equals parsedCompares.compares.firefox['/404.html?a=1'].images.build, 'screenshots/firefox/%2F404.html%3Fa%3D1/build.png'
 
     test.done()
 
