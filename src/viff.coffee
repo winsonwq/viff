@@ -1,7 +1,10 @@
 mr = require 'Mr.Async'
 _ = require 'underscore'
+Canvas = require 'canvas'
+
 webdriver = require 'selenium-webdriver'
 Comparison = require './comparison'
+
 
 class Viff
   constructor: (seleniumHost) ->
@@ -19,12 +22,16 @@ class Viff
       @drivers[browserName] = driver
 
     envName = _.first(envName for envName of envHost)
-    [url, preHandle] = url if _.isArray url
+    [url, selector, preHandle] = Viff.parseUrl url
 
     driver.get envHost[envName] + url
     preHandle driver, webdriver if _.isFunction preHandle
     driver.takeScreenshot().then (base64Img) -> 
-      defer.resolve base64Img
+      if _.isString selector
+        Viff.dealWithPartial base64Img, driver, selector, (partialBase64Img) ->
+          defer.resolve partialBase64Img
+      else 
+        defer.resolve base64Img
 
     defer.promise()
 
@@ -41,8 +48,7 @@ class Viff
       compares[browser] = compares[browser] || {}
       
       _.each links, (url) ->
-        path = url
-        path = _.first url if _.isArray url
+        path = Viff.getPathKey url
         envCompares = {}
 
         _.each envHosts, (host, env) ->
@@ -65,6 +71,28 @@ class Viff
           
     defer.promise()
 
+  @getPathKey: (url) ->
+    [path, selector, preHandle] = Viff.parseUrl url
+    path = "#{path} (#{selector})" if _.isString selector
+    path
+
+  @dealWithPartial: (base64Img, driver, selector, callback) ->
+    defer = mr.Deferred()
+    defer.done callback
+
+    driver.findElement(webdriver.By.css(selector)).then (elem) ->
+      elem.getLocation().then (location) ->
+        elem.getSize().then (size) ->
+          cvs = new Canvas(size.width, size.height)
+          ctx = cvs.getContext '2d'
+          img = new Canvas.Image
+          img.src = new Buffer base64Img, 'base64'
+          ctx.drawImage img, location.x, location.y, size.width, size.height, 0, 0, size.width, size.height
+
+          defer.resolve cvs.toBuffer().toString('base64')
+
+    defer.promise()
+
   @diff: (compares, callback) ->
     defer = mr.Deferred()
     defer.done callback
@@ -84,5 +112,14 @@ class Viff
         ret.push comparison
 
     ret
+
+  @parseUrl = (urlInfo) ->
+    url = urlInfo
+    if _.isArray(urlInfo)
+      url = _.first urlInfo 
+      preHandle = _.last urlInfo if _.isFunction _.last(urlInfo)
+      selector = urlInfo[1] if _.isString urlInfo[1]
+
+    [url, selector, preHandle]
 
 module.exports = Viff

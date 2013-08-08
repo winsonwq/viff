@@ -31,7 +31,8 @@
     "handlebars": "~1.0.12", 
     "resemble": "~1.0.3",
     "wrench": "*",
-    "colors": "*"
+    "colors": "*",
+    "canvas": "~1.0.3"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
