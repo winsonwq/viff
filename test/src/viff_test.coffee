@@ -29,10 +29,8 @@ module.exports =
     @links = ['/404.html', '/strict-mode']
     callback()
   tearDown: (callback) ->
-    method.restore() for method in [
-      @viff.builder.build
-      @thenObj.then
-    ]
+    for method in [@viff.builder.build, @thenObj.then]
+      method.restore() 
 
     callback()
 
@@ -85,6 +83,18 @@ module.exports =
       test.done()
     @viff.takeScreenshots @config.browsers, @config.compare, links, callback
 
+  'it should use correct path string when set selector': (test) ->
+    links = [['/404.html', '#page', (driver, webdriver) -> ]]
+    sinon.stub(Viff, 'dealWithPartial').callsArgWith(3, 'partialBase64Img');
+
+    callback = (compares) -> 
+      Viff.dealWithPartial.restore()
+      
+      test.equals _.first(_.keys(compares.firefox)), '/404.html (#page)'
+      test.done()
+
+    @viff.takeScreenshots @config.browsers, @config.compare, links, callback
+
   'it should take many screenshots according to config': (test) ->
     format = 
       safari:
@@ -115,7 +125,57 @@ module.exports =
     Viff.diff compares
     test.equals diff.callCount, 4
     test.done()
-    
+
+  'it should take partial screenshot according to selecor': (test) ->
+    envHost = 
+      build: 'http://localhost:4000'
+
+    preHandler = sinon.spy()
+    link = ['/path', 'selector', preHandler]
+    partialTake = sinon.stub(Viff, 'dealWithPartial').returns { then: -> }
+
+    @viff.takeScreenshot('firefox', envHost, link)
+    partialTake.restore()
+
+    test.ok partialTake.calledWith 'base64string', @driver, 'selector'
+    test.done()
+
+  'it should run pre-handler when using selector': (test) ->
+    envHost = 
+      build: 'http://localhost:4000'
+
+    preHandler = sinon.spy()
+    link = ['/path', 'selector', preHandler]
+    partialTake = sinon.stub(Viff, 'dealWithPartial').returns { then: -> }
+
+    @viff.takeScreenshot('firefox', envHost, link)
+    partialTake.restore()
+
+    test.ok preHandler.calledWith @driver, webdriver
+    test.done()      
+
+  'it should parse correct url info when only set path': (test) ->
+    [url, selector, preHandler] = Viff.parseUrl '/'
+    test.equals url, '/'
+    test.equals selector, undefined
+    test.equals preHandler, undefined
+    test.done()
+
+  'it should parse correct url info when only set path and pre-handler': (test) ->
+    pre = ->
+    [url, selector, preHandler] = Viff.parseUrl ['/', pre]
+    test.equals url, '/'
+    test.equals selector, undefined
+    test.equals preHandler, pre
+    test.done()
+
+  'it should parse correct url info when set path, selector and pre-handler': (test) ->
+    pre = ->
+    [url, selector, preHandler] = Viff.parseUrl ['/', '#id', pre]
+    test.equals url, '/'
+    test.equals selector, '#id'
+    test.equals preHandler, pre
+    test.done()
     
     
     
