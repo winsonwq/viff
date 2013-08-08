@@ -2,13 +2,21 @@
 
 module.exports = {
     seleniumHost: 'http://localhost:4444/wd/hub',
-    browsers: ['safari'],
+    browsers: ['firefox'],
     envHosts: {
-      build: 'http://localhost:4000',
-      prod: 'http://ishouldbeageek.me'
+      build: 'http://suncorpbank.com.au',
+      prod: 'http://suncorpbank.com.au'
     },
     paths: [
-      ['/', '#sidebar']
+      ['/', '.region.region-sidebar-second.sidebar'],
+      ['/', '#block-menu-block-1'],
+      ['/', '#columns'],
+      ['/', '#page-footer'],
+      '/savings',
+      '/savings-accounts',
+      '/savings/savings-accounts/help-me-choose',
+      ['/savings/savings-accounts/help-me-choose', '.call-to-action'],
+      ['/bank-accounts/personal-transactions/compare-accounts', '#main-content']
     ],
     reportFormat: 'file'
 };

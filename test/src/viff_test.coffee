@@ -29,10 +29,8 @@ module.exports =
     @links = ['/404.html', '/strict-mode']
     callback()
   tearDown: (callback) ->
-    method.restore() for method in [
-      @viff.builder.build
-      @thenObj.then
-    ]
+    for method in [@viff.builder.build, @thenObj.then]
+      method.restore() 
 
     callback()
 
@@ -83,6 +81,18 @@ module.exports =
     callback = (compares) -> 
       test.equals _.first(_.keys(compares.firefox)), '/404.html'
       test.done()
+    @viff.takeScreenshots @config.browsers, @config.compare, links, callback
+
+  'it should use correct path string when set selector': (test) ->
+    links = [['/404.html', '#page', (driver, webdriver) -> ]]
+    sinon.stub(Viff, 'dealWithPartial').callsArgWith(3, 'partialBase64Img');
+
+    callback = (compares) -> 
+      Viff.dealWithPartial.restore()
+      
+      test.equals _.first(_.keys(compares.firefox)), '/404.html (#page)'
+      test.done()
+
     @viff.takeScreenshots @config.browsers, @config.compare, links, callback
 
   'it should take many screenshots according to config': (test) ->

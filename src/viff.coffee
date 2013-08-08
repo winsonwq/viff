@@ -48,8 +48,7 @@ class Viff
       compares[browser] = compares[browser] || {}
       
       _.each links, (url) ->
-        path = url
-        path = _.first url if _.isArray url
+        path = Viff.getPathKey url
         envCompares = {}
 
         _.each envHosts, (host, env) ->
@@ -71,6 +70,11 @@ class Viff
               defer.resolve compares
           
     defer.promise()
+
+  @getPathKey: (url) ->
+    [path, selector, preHandle] = Viff.parseUrl url
+    path = "#{path} (#{selector})" if _.isString selector
+    path
 
   @dealWithPartial: (base64Img, driver, selector, callback) ->
     defer = mr.Deferred()
