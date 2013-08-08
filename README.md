@@ -71,6 +71,8 @@ Actually, these arguments like `--selenium-host` are optional. But if set, the i
 
 # History
 
+2013-08-08 **viff@0.4.0**  add partial screenshot support. working perfectly in firefox, phantomjs.
+
 2013-08-01 **viff@0.3.0**  add new report format `file`, which will generate images.
 
 2013-07-24 **viff@0.2.0**  use [resemble.js](https://github.com/Huddle/Resemble.js) to replace imagemagick
