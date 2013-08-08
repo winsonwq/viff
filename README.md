@@ -42,7 +42,11 @@ module.exports = [
   '/page3',
   '/page4',
   '/page5',
-  '/strict-mode'
+  '/strict-mode',
+  ['/', function clickLink(browser, webdriver) {
+    browser.findElement(webdriver.By.partialLinkText('viff')).click();
+  }],
+  ['/', '#main-content'/*, function (browser, webdriver) { } */]
 ];
 
 // build_prod.config.js
@@ -50,13 +54,13 @@ module.exports = [
 
 module.exports = {
   seleniumHost: 'http://localhost:4444/wd/hub',
-  browsers: ['firefox', 'chrome', 'safari', 'opera'],
+  browsers: ['firefox'/*, 'chrome', 'safari', 'opera'*/],
   envHosts: {
     build: 'http://localhost:4000',
     prod: 'http://www.ishouldbeageek.me'
   },
   paths: require('./links.js'),
-  reportFormat: 'html'
+  reportFormat: 'file' /* 'html' or 'json' */
 };
 ```
 Then, you could run
@@ -68,6 +72,11 @@ Actually, these arguments like `--selenium-host` are optional. But if set, the i
 
 ## html report example
 ![html report example](http://ww2.sinaimg.cn/mw1024/64eae748tw1e6leimsy64j20rm0go0u6.jpg)
+
+## file report embeded in viff reporter
+![file report example](http://ww2.sinaimg.cn/mw1024/64eae748jw1e7fmlo9otwj21kw0vrqe5.jpg)
+
+repo for viff reporter is [ViffReport](https://github.com/xjsi/ViffReport)
 
 # History
 
