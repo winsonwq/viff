@@ -5,6 +5,8 @@ Canvas = require 'canvas'
 webdriver = require 'selenium-webdriver'
 Comparison = require './comparison'
 
+webdriver.promise.controlFlow().on 'uncaughtException', (e) -> 
+  console.error 'Unhandled error: ' + e
 
 class Viff
   constructor: (seleniumHost) ->
