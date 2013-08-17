@@ -66,7 +66,7 @@ class Viff
               returned++
 
             if _.isEqual links.length, _.keys(compares[browser]).length
-              that.drivers[browser].close()
+              that.drivers[browser].quit()
 
             if returned == total
               defer.resolve compares

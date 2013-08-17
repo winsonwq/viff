@@ -19,7 +19,7 @@ module.exports =
     @driver = 
       get: (url) -> 
       takeScreenshot: => @thenObj
-      close: ->
+      quit: ->
 
     
     @getUrl = sinon.spy @driver, 'get'
