@@ -176,6 +176,17 @@ module.exports =
     test.equals selector, '#id'
     test.equals preHandler, pre
     test.done()
+
+  'it should parse correct urlinfo when set description and path': (test) ->
+    [url, selector, preHandler, description] = Viff.parseUrl { 'this is description of testcase' : '/' }
+    test.equals description, 'this is description of testcase'
+    test.equals url, '/'
+    test.done()
+
+  'it should return correct path key for testcase when set description' : (test) ->
+    test.equals 'this is testcase description', Viff.getPathKey { 'this is testcase description' : '/' }
+    test.done()
+
     
     
     
