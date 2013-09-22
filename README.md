@@ -46,7 +46,8 @@ module.exports = [
   ['/', function clickLink(browser, webdriver) {
     browser.findElement(webdriver.By.partialLinkText('viff')).click();
   }],
-  ['/', '#main-content'/*, function (browser, webdriver) { } */]
+  ['/', '#main-content'/*, function (browser, webdriver) { } */],
+  { 'this is a testcase description' : ['/' /*, '#main-content', function(browser, webdriver) {} */]}
 ];
 
 // build_prod.config.js
@@ -79,6 +80,7 @@ Actually, these arguments like `--selenium-host` are optional. But if set, the i
 repo for viff reporter is [ViffReport](https://github.com/xjsi/ViffReport)
 
 # History
+2013-09-22 **viff@0.4.1** could write testcase description.
 
 2013-08-08 **viff@0.4.0**  add partial screenshot support. working perfectly in firefox, phantomjs.
 
