@@ -74,8 +74,11 @@ class Viff
     defer.promise()
 
   @getPathKey: (url) ->
-    [path, selector, preHandle] = Viff.parseUrl url
-    path = "#{path} (#{selector})" if _.isString selector
+    [path, selector, preHandle, description] = Viff.parseUrl url
+    if _.isString description
+      path = description
+    else if _.isString selector
+      path = "#{path} (#{selector})" if _.isString selector
     path
 
   @dealWithPartial: (base64Img, driver, selector, callback) ->
@@ -117,11 +120,15 @@ class Viff
 
   @parseUrl = (urlInfo) ->
     url = urlInfo
+    if Object.prototype.toString.call(urlInfo) is '[object Object]'
+      description = _.first _.keys urlInfo
+      urlInfo = _.values urlInfo
+
     if _.isArray(urlInfo)
       url = _.first urlInfo 
       preHandle = _.last urlInfo if _.isFunction _.last(urlInfo)
       selector = urlInfo[1] if _.isString urlInfo[1]
 
-    [url, selector, preHandle]
+    [url, selector, preHandle, description]
 
 module.exports = Viff
