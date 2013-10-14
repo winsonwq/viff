@@ -172,6 +172,20 @@ module.exports =
 
     test.done()
 
+  'it should return help menu when only executing "viff"': (test) ->
+    argv = [
+      'node'
+      '/Users/tw/Projects/viff/lib/index.js'
+    ]
+
+    config = processArgv argv
+    test.ok _.isEqual typeof(config), 'string'
+    test.ok config.indexOf('Usage:') >= 0
+
+    test.done()
+
+
+
 
 
   
