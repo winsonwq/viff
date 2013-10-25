@@ -119,15 +119,16 @@ class Viff
     ret
 
   @parseUrl = (urlInfo) ->
-    url = urlInfo
     if Object.prototype.toString.call(urlInfo) is '[object Object]'
       description = _.first _.keys urlInfo
-      urlInfo = _.values urlInfo
+      urlInfo = urlInfo[description]
 
-    if _.isArray(urlInfo)
+    if _.isArray urlInfo
       url = _.first urlInfo 
       preHandle = _.last urlInfo if _.isFunction _.last(urlInfo)
       selector = urlInfo[1] if _.isString urlInfo[1]
+    else if _.isString urlInfo
+      url = urlInfo
 
     [url, selector, preHandle, description]
 
