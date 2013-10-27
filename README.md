@@ -80,6 +80,9 @@ Actually, these arguments like `--selenium-host` are optional. But if set, the i
 repo for viff reporter is [ViffReport](https://github.com/xjsi/ViffReport)
 
 # History
+
+2013-09-22 **viff@0.4.2** won't stop testing if one of them fail.
+
 2013-09-22 **viff@0.4.1** could write testcase description.
 
 2013-08-08 **viff@0.4.0**  add partial screenshot support. working perfectly in firefox, phantomjs.
