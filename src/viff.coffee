@@ -28,12 +28,19 @@ class Viff
 
     driver.get envHost[envName] + url
     preHandle driver, webdriver if _.isFunction preHandle
-    driver.takeScreenshot().then (base64Img) -> 
-      if _.isString selector
-        Viff.dealWithPartial base64Img, driver, selector, (partialBase64Img) ->
-          defer.resolve partialBase64Img
-      else 
-        defer.resolve base64Img
+
+    driver.call( ->
+      driver.takeScreenshot().then (base64Img) -> 
+        if _.isString selector
+          Viff.dealWithPartial base64Img, driver, selector, (partialBase64Img) ->
+            defer.resolve partialBase64Img
+        else 
+          defer.resolve base64Img
+
+      return
+    ).addErrback (ex) ->
+      console.error "ERROR: For path #{url} with selector #{selector||''}, #{ex.message.split('\n')[0]}"
+      defer.resolve ''
 
     defer.promise()
 
@@ -62,7 +69,8 @@ class Viff
             _.extend(envCompares, envHost)
 
             if _.isEqual _.keys(envCompares), _.keys(envHosts)
-              compares[browser][path] = new Comparison(envCompares)
+              unless _.contains _.values(envCompares), ''
+                compares[browser][path] = new Comparison(envCompares) 
               returned++
 
             if _.isEqual links.length, _.keys(compares[browser]).length

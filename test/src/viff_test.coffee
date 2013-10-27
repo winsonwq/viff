@@ -17,10 +17,12 @@ module.exports =
     
     @thenObj = then: ->
     @driver = 
+      call: (fn) -> 
+        fn()
+        { addErrback: -> }
       get: (url) -> 
       takeScreenshot: => @thenObj
       quit: ->
-
     
     @getUrl = sinon.spy @driver, 'get'
     sinon.stub(@viff.builder, 'build').returns(@driver)
