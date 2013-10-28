@@ -20,12 +20,12 @@ parseEnvHosts = (value) ->
   envHosts
 
 parsePaths = (value) ->
-  _.select value.split(','), (path) -> !_.isEmpty(path.trim())
+  (p.trim() for p in value.split(',') when !_.isEmpty(p.trim()))
 
-mergeAndValidateConfig = (seleniumHost, browsers, envHosts, paths, reportFormat, config) ->
-  c = config || {}
-  
-  for name, idx in ['seleniumHost', 'browsers', 'envHosts', 'paths', 'reportFormat']
+mergeAndValidateConfig = (seleniumHost, browsers, envHosts, paths, reportFormat, grep, config) ->
+  c = _.extend {}, config
+
+  for name, idx in ['seleniumHost', 'browsers', 'envHosts', 'paths', 'reportFormat', 'grep']
     c[name] = arguments[idx] || c[name]
 
   c.browsers = ['firefox'] if c.browsers is undefined or c.browsers.length == 0
@@ -36,6 +36,19 @@ mergeAndValidateConfig = (seleniumHost, browsers, envHosts, paths, reportFormat,
   throw new Error('-paths aren\'t set correctly.') if c.paths is undefined or c.paths.length is 0
 
   c
+
+filterByGrep = (paths, grep) ->
+  [ret, ps] = [[], paths || []]
+  reg = new RegExp grep
+
+  ps.forEach (p, idx) ->
+    target = p if _.isString p
+    target = _.first(p) if _.isArray p
+    target = _.first(_.keys(p)) if Object.prototype.toString.call(p) is '[object Object]'
+    
+    ret.push(p) if reg.test target
+
+  ret
 
 checkIfNeedHelp = (args) ->
   argsCollection = ['-browsers', '-envs', '-paths', '--report-format', '--selenium-host']
@@ -48,14 +61,17 @@ checkIfNeedHelp = (args) ->
   needHelp
 
 help = ->
+  version = require('../package.json').version
   """
-  
+  Version: #{version}
+
   Usage: viff [options] [config file path]
 
   Options:
 
     -browsers <borwser1/*, browser2 ...*/>     config the browsers using browser name, by default firefox 
     -envs <env1=url1, env2=url2>               config two environments, env1 and env2 could be updated
+    -grep <grep>                               config description or path matched testcases
     -paths <path1/*, path2 ...*/>              config the paths to compare
     --report-format <format>                   config the output format in file/json/html, by default file
     --selenium-host <host>                     config selenium host, such as "http://localhost:4444/wd/hub"
@@ -70,6 +86,7 @@ help = ->
          -browsers "firefox,chrome" 
          -envs build=http://localhost:4000,prod=http://ishouldbeageek.me 
          -paths "/404.html,/page2" 
+         -grep "path1"
          --report-format file
          /Users/xx/test.config.js
 
@@ -97,10 +114,15 @@ processArgv = (args) ->
       when '--selenium-host'
         seleniumHost = args.shift().trim()
 
+      when '-grep'
+        grep = args.shift().trim()
+
       else
         if arg.indexOf('.config.js') > 0
           config = require path.resolve process.cwd(), arg
 
-  mergeAndValidateConfig seleniumHost, browsers, envHosts, paths, reportFormat, config
+  c = mergeAndValidateConfig seleniumHost, browsers, envHosts, paths, reportFormat, grep, config
+  c.paths = filterByGrep(c.paths, grep) if grep
+  c
 
 module.exports = processArgv

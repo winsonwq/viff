@@ -1,5 +1,6 @@
 _ = require 'underscore'
 sinon = require 'sinon'
+should = require('chai').should()
 path = require 'path'
 
 processArgv = require '../../lib/process.argv.js'
@@ -24,17 +25,20 @@ module.exports =
       '--report-format',
       'html',
       '--selenium-host',
-      'http://localhost:4444/wd/hub'
+      'http://localhost:4444/wd/hub',
+      '-grep',
+      '404'
     ]
 
     config = processArgv argv
 
-    test.ok _.isEqual _.keys(config), ['seleniumHost', 'browsers', 'envHosts', 'paths', 'reportFormat']
+    test.ok _.isEqual _.keys(config), ['seleniumHost', 'browsers', 'envHosts', 'paths', 'reportFormat', 'grep']
     test.ok _.isEqual config.browsers, ['firefox', 'chrome']
     test.ok _.isEqual config.envHosts, { build: 'http://localhost:4000', prod: 'http://ishouldbeageek.me' }
     test.ok _.isEqual config.paths, ['/404.html']
     test.ok _.isEqual config.reportFormat, 'html'
     test.ok _.isEqual config.seleniumHost, 'http://localhost:4444/wd/hub'
+    test.ok _.isEqual config.grep, '404'
     test.done()
 
   'it should ignore the blank between ","': (test) ->
@@ -167,9 +171,43 @@ module.exports =
 
     test.ok _.isEqual config.browsers, ['safari', 'firefox']
     test.ok _.isEqual config.envHosts, { custom: 'http://localhost:4000', custom2: 'http://localhost:4001' }
-    test.ok _.isEqual config.paths, ['/strict-mode']
+    test.ok _.isEqual config.paths, [
+      '/strict-mode', 
+      { 'test case description': ['/', '#selector'] }, 
+      ['/hello-world', '#selector2']
+    ]
     test.ok _.isEqual config.reportFormat, 'json'
 
+    test.done()
+
+  'it should return config for matched cases': (test) ->
+    argv = [ 
+      'node', 
+      '/Users/tw/Projects/viff/lib/index.js',
+      '-paths', 
+      '/404.html, /find-path, /hello',
+      './test/src/correct.config.js',
+      '-grep', '-'
+    ]
+
+    config = processArgv argv
+    config.paths.length.should.equal 1
+    config.paths.should.contain '/find-path'
+    test.done()
+
+  'it should return config for matched cases when only using config.js': (test) ->
+    argv = [ 
+      'node', 
+      '/Users/tw/Projects/viff/lib/index.js',
+      './test/src/correct.config.js',
+      '-grep', '-'
+    ]
+
+    config = processArgv argv
+    
+    config.paths.length.should.equal 2
+    config.paths[0].should.equal '/strict-mode'
+    config.paths[1][0].should.equal '/hello-world'
     test.done()
 
   'it should return help menu when only executing "viff"': (test) ->
