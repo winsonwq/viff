@@ -32,8 +32,7 @@
     "resemble": "~1.0.3",
     "wrench": "*",
     "colors": "*",
-    "canvas": "~1.0.3",
-    "shelljs": "~0.2.6"
+    "canvas": "~1.0.3"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -49,7 +48,7 @@
   },
   "scripts": {
     "build": "coffee -o ./lib/ -c src/*.coffee",
-    "preinstall": "coffee ./pre-install.coffee",
+    "preinstall": "npm install shelljs && coffee ./pre-install.coffee",
     "install": "npm run build",
     "test": "npm install && grunt default"
   }
