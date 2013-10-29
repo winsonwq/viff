@@ -52,8 +52,10 @@ macInstall = ->
 platform = process.platform
 if platform is 'darwin'
   macInstall()
+  exit 0
 else if platform is 'linux'
   linuxInstall()
+  exit 0
 else
   echo 'Installing in Fedora, refers to https://github.com/LearnBoost/node-canvas/wiki/Installation---Fedora'
   echo 'Installing in Windows, refers to https://github.com/LearnBoost/node-canvas/wiki/Installation---Windows'
