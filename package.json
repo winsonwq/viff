@@ -48,7 +48,7 @@
   },
   "scripts": {
     "build": "coffee -o ./lib/ -c src/*.coffee",
-    "preinstall": "npm install shelljs && coffee ./pre-install.coffee",
+    "preinstall": "sudo npm install shelljs && coffee ./pre-install.coffee",
     "install": "npm run build",
     "test": "npm install && grunt default"
   }
