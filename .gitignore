@@ -1,8 +1,14 @@
 chromedriver.log
 report.html
 .DS_Store
+pkgconfig.tgz
+pixman.tar.gz
+cairo.tar.xz
 
 /node_modules/
 /lib/
 /test/build/
 /tmp/
+/pkg-config-0.23/
+/pixman-0.22.0/
+/cairo-1.12.8/
