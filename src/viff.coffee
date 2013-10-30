@@ -22,7 +22,7 @@ class Viff extends EventEmitter
     that = @
     defer = mr.Deferred()
     
-    defer.done (base64Img) => @emit 'tookScreenshot', browserName, envHost, url, base64Img
+    defer.done (base64Img, duration) => @emit 'tookScreenshot', browserName, envHost, url, duration, base64Img
     defer.done(callback)
     
     unless driver = @drivers[browserName]
@@ -33,16 +33,18 @@ class Viff extends EventEmitter
     envName = _.first(envName for envName of envHost)
     [parsedUrl, selector, preHandle] = Viff.parseUrl url
 
+
     driver.get envHost[envName] + parsedUrl
     preHandle driver, webdriver if _.isFunction preHandle
 
     driver.call( ->
+      startDate = Date.now()
       driver.takeScreenshot().then (base64Img) -> 
         if _.isString selector
           Viff.dealWithPartial base64Img, driver, selector, (partialBase64Img) ->
-            defer.resolve partialBase64Img
+            defer.resolve partialBase64Img, Date.now() - startDate
         else 
-          defer.resolve base64Img
+          defer.resolve base64Img, Date.now() - startDate
 
       return
     ).addErrback (ex) ->

@@ -1,15 +1,10 @@
+require './color.helper.js'
 _ = require 'underscore'
 handlebars = require 'handlebars'
-colors = require 'colors'
 template = require './html.report.template.js'
 ImageGenerator = require './image.generator.js'
 
 render = handlebars.compile template
-
-colors.setTheme 
-  info: 'green'
-  prompt: 'magenta'
-  greyColor: 'grey'
 
 class Reporter
   constructor: (@compares) ->

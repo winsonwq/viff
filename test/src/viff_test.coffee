@@ -181,7 +181,7 @@ module.exports =
 
     link = ['/path', ->]
 
-    @viff.on 'tookScreenshot', (browserName, host, url, base64Img) ->
+    @viff.on 'tookScreenshot', (browserName, host, url, duration, base64Img) ->
       test.equals browserName, 'firefox'
       test.equals host, envHost
       test.equals url, link
