@@ -5,9 +5,9 @@ command_exist() {
 }
 
 if command_exist sw_vers; then # Mac
-  sh ./mac-pre-install.sh
+  sudo sh ./mac-pre-install.sh
 elif command_exist lscpu; then # Linux
-  sh ./ubuntu-pre-install.sh
+  sudo sh ./ubuntu-pre-install.sh
 fi
 
 exit 0
