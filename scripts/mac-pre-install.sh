@@ -13,6 +13,7 @@ install_pkgconfig() {
     fi
     tar -zxf pkgconfig.tgz && cd pkg-config-0.28/
     ./configure && make install
+    cd ..
   fi
   export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
   export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/opt/X11/lib/pkgconfig
@@ -26,6 +27,7 @@ install_pixman() {
   tar -zxf pixman.tar.gz && cd pixman-0.30.0/
   ./configure --prefix=/usr/local --disable-dependency-tracking
   make install
+  cd ..
 }
 
 install_cario() {
@@ -41,6 +43,7 @@ install_cario() {
     tar -xJf cairo.tar.xz && cd cairo-1.12.8
     ./configure --prefix=/usr/local --disable-dependency-tracking
     make install
+    cd ..
   fi
 }
 
