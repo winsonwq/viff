@@ -1,7 +1,7 @@
 {
   "name": "viff",
   "description": "Find virtual differences between web pages in different environments(developing, staging, production) and browsers.",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "homepage": "https://github.com/winsonwq/viff",
   "author": {
     "name": "Wang Qiu",
