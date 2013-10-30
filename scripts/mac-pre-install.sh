@@ -12,7 +12,7 @@ install_pkgconfig() {
       curl http://pkgconfig.freedesktop.org/releases/pkg-config-0.28.tar.gz -o pkgconfig.tgz
     fi
     tar -zxf pkgconfig.tgz && cd pkg-config-0.28/
-    ./configure && sudo make install
+    ./configure && make install
   fi
   export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig
   export PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/opt/X11/lib/pkgconfig
@@ -25,7 +25,7 @@ install_pixman() {
   fi
   tar -zxf pixman.tar.gz && cd pixman-0.30.0/
   ./configure --prefix=/usr/local --disable-dependency-tracking
-  sudo make install
+  make install
 }
 
 install_cario() {
@@ -40,7 +40,7 @@ install_cario() {
     fi
     tar -xJf cairo.tar.xz && cd cairo-1.12.8
     ./configure --prefix=/usr/local --disable-dependency-tracking
-    sudo make install
+    make install
   fi
 }
 
