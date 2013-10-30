@@ -110,6 +110,25 @@ module.exports =
       test.ok _.isEqual _.keys(format), _.keys(compares)
       test.ok _.isEqual _.keys(compares.safari), _.keys(compares.firefox)
       test.done()
+
+    @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
+
+  'it should take fire many times `tookScreenshot` handler': (test) ->
+    format = 
+      safari:
+        '/404.html': {}
+        '/strict-mode': {}
+      firefox:
+        '/404.html': {}
+        '/strict-mode': {}
+
+    tookScreenshotHandler = sinon.spy()
+    @viff.on 'tookScreenshot', tookScreenshotHandler
+
+    callback = (compares) -> 
+      test.equals tookScreenshotHandler.callCount, 8
+      test.done()
+    
     @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
 
   'it should diff all screenshot': (test) ->
@@ -154,7 +173,22 @@ module.exports =
     partialTake.restore()
 
     test.ok preHandler.calledWith @driver, webdriver
-    test.done()      
+    test.done()
+
+  'it should fire testcase `tookScreenshot` hook': (test) ->
+    envHost = 
+      build: 'http://localhost:4000'
+
+    link = ['/path', ->]
+
+    @viff.on 'tookScreenshot', (browserName, host, url, base64Img) ->
+      test.equals browserName, 'firefox'
+      test.equals host, envHost
+      test.equals url, link
+      test.equals base64Img, 'base64string'
+      test.done() 
+    
+    @viff.takeScreenshot('firefox', envHost, link)
 
   'it should parse correct url info when only set path': (test) ->
     [url, selector, preHandler] = Viff.parseUrl '/'

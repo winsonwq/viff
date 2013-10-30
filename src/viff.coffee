@@ -1,6 +1,8 @@
 mr = require 'Mr.Async'
 _ = require 'underscore'
 Canvas = require 'canvas'
+util = require 'util'
+EventEmitter = require('events').EventEmitter
 
 webdriver = require 'selenium-webdriver'
 Comparison = require './comparison'
@@ -8,14 +10,19 @@ Comparison = require './comparison'
 webdriver.promise.controlFlow().on 'uncaughtException', (e) -> 
   console.error 'Unhandled error: ' + e
 
-class Viff
+class Viff extends EventEmitter
   constructor: (seleniumHost) ->
+    EventEmitter.call @
+
     @builder = new webdriver.Builder().usingServer(seleniumHost)
     @drivers = {}
 
   takeScreenshot: (browserName, envHost, url, callback) -> 
+
     that = @
     defer = mr.Deferred()
+    
+    defer.done (base64Img) => @emit 'tookScreenshot', browserName, envHost, url, base64Img
     defer.done(callback)
     
     unless driver = @drivers[browserName]
@@ -24,9 +31,9 @@ class Viff
       @drivers[browserName] = driver
 
     envName = _.first(envName for envName of envHost)
-    [url, selector, preHandle] = Viff.parseUrl url
+    [parsedUrl, selector, preHandle] = Viff.parseUrl url
 
-    driver.get envHost[envName] + url
+    driver.get envHost[envName] + parsedUrl
     preHandle driver, webdriver if _.isFunction preHandle
 
     driver.call( ->
