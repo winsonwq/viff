@@ -25,14 +25,15 @@
     "node": ">0.8.0"
   },
   "dependencies": {
-    "Mr.Async": "~0.3.1",
+    "Mr.Async": "latest",
     "underscore": "*",
     "selenium-webdriver": ">=2.33.0",
     "handlebars": "~1.0.12", 
     "resemble": "~1.0.3",
     "wrench": "*",
     "colors": "*",
-    "canvas": "~1.0.3"
+    "canvas": "~1.0.3",
+    "webdriver-helper": "~0.2.1"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

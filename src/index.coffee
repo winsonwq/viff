@@ -1,4 +1,5 @@
 _ = require 'underscore'
+require 'webdriver-helper'
 
 Viff = require './viff.js'
 Reporter = require './reporter.js'
