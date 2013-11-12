@@ -56,56 +56,46 @@ class Viff extends EventEmitter
     cases = []
     _.each browsers, (browser) ->
       _.each links, (url) ->
-        [envFrom, envTo] = _.keys envHosts
-        [envFromPath, envToPath] = _.values envHosts
+        [[from, envFromPath], [to, envToPath]] = _.pairs envHosts
 
         cases.push 
           browser: browser
           url: url
-          envFrom: envFrom
-          envTo: envTo
-          envFromPath: envFromPath
-          envToPath: envToPath
+          fromname: from
+          toname: to
+          from: _.object [[from, envFromPath]]
+          to: _.object [[to, envToPath]]
 
     cases
 
+  caseShot: (_case) ->
+    fromDefer = @takeScreenshot _case.browser, _case.from, _case.url
+    toDefer = @takeScreenshot _case.browser, _case.to, _case.url
+
+    [fromDefer, toDefer]
+
   takeScreenshots: (browsers, envHosts, links, callback) ->
-    defer = mr.Deferred()
-    defer.done callback
-
-    compares = {}
-    returned = 0
-    total = browsers.length * links.length
+    defer = mr.Deferred().done callback
+    cases = @constructCases browsers, envHosts, links
     that = this
+    compares = {}
 
-    _.each browsers, (browser) ->
-      compares[browser] = compares[browser] || {}
-      
-      _.each links, (url) ->
-        path = Viff.getPathKey url
-        envCompares = {}
+    mr.asynEach(cases, (c) ->
+      iterator = this
 
-        _.each envHosts, (host, env) ->
-          envHost = {}
-          envHost[env] = host
-          
-          that.takeScreenshot browser, envHost, url, (base64Img) ->
-            envHost[env] = base64Img
-            _.extend(envCompares, envHost)
+      path = Viff.getPathKey c.url
+      compares[c.browser] = compares[c.browser] || {}
 
-            if _.isEqual _.keys(envCompares), _.keys(envHosts)
-              # fail to take the screenshot
-              unless _.contains _.values(envCompares), ''
-                compares[browser][path] = new Comparison(envCompares)
-              returned++
+      mr.when(that.caseShot(c)).then (fromImage, fromDuration, toImage, toDuration) ->
+        imgWithEnvs = _.object [[c.fromname, fromImage], [c.toname, toImage]]
+        compares[c.browser][path] = new Comparison imgWithEnvs
 
-            if _.isEqual links.length, _.keys(compares[browser]).length
-              # quit with all testcases are done for current browser
-              that.drivers[browser].quit()
+        that.drivers[c.browser].quit() if links.length == _.keys(compares[c.browser]).length
 
-            if returned == total
-              defer.resolve compares
-          
+        iterator.next()
+
+    , -> defer.resolve compares).start()
+
     defer.promise()
 
   @getPathKey: (url) ->

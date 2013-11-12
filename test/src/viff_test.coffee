@@ -1,5 +1,6 @@
 sinon = require 'sinon'
 _ = require 'underscore'
+mr = require 'Mr.Async'
 require('chai').should()
 
 Viff = require '../../lib/viff.js'
@@ -30,10 +31,14 @@ module.exports =
     sinon.stub(@viff.builder, 'build').returns(@driver)
     sinon.stub(@thenObj, 'then').yields 'base64string'
 
+    @mrThen = then: ->
+    sinon.stub(mr, 'when').returns @mrThen
+    sinon.stub(@mrThen, 'then').yields 'base64string', 1000, 'base64string2', 2000
+
     @links = ['/404.html', '/strict-mode']
     callback()
   tearDown: (callback) ->
-    for method in [@viff.builder.build, @thenObj.then]
+    for method in [@viff.builder.build, @thenObj.then, mr.when, @mrThen.then]
       method.restore() 
 
     callback()
