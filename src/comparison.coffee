@@ -9,8 +9,7 @@ class Comparison
     @images = imgWithEnvs
 
   diff: (callback) ->
-    defer = mr.Deferred()
-    defer.done callback
+    defer = mr.Deferred().done callback
 
     that = @
     fileData = _.map _.values(@images), (base64Img) ->

@@ -2,7 +2,7 @@ mr = require 'Mr.Async'
 _ = require 'underscore'
 Canvas = require 'canvas'
 util = require 'util'
-EventEmitter = require('events').EventEmitter
+{EventEmitter} = require 'events'
 
 webdriver = require 'selenium-webdriver'
 Comparison = require './comparison'
@@ -86,14 +86,15 @@ class Viff extends EventEmitter
       path = Viff.getPathKey c.url
       compares[c.browser] = compares[c.browser] || {}
 
-      mr.when(that.caseShot(c)).then (fromImage, fromDuration, toImage, toDuration) ->
+      mr.when.apply(mr, that.caseShot(c)).then (fromImage, fromDuration, toImage, toDuration) ->
         imgWithEnvs = _.object [[c.fromname, fromImage], [c.toname, toImage]]
-        compares[c.browser][path] = new Comparison imgWithEnvs
-
-        that.drivers[c.browser].quit() if links.length == _.keys(compares[c.browser]).length
-
-        iterator.next()
-
+        comparison = new Comparison imgWithEnvs
+        
+        comparison.diff (diffImg) ->
+          compares[c.browser][path] = comparison
+          that.drivers[c.browser].quit() if links.length == _.keys(compares[c.browser]).length
+          iterator.next()
+        
     , -> defer.resolve compares).start()
 
     defer.promise()
@@ -107,8 +108,7 @@ class Viff extends EventEmitter
     path
 
   @dealWithPartial: (base64Img, driver, selector, callback) ->
-    defer = mr.Deferred()
-    defer.done callback
+    defer = mr.Deferred().done callback
 
     driver.findElement(webdriver.By.css(selector)).then (elem) ->
       elem.getLocation().then (location) ->
@@ -124,8 +124,7 @@ class Viff extends EventEmitter
     defer.promise()
 
   @diff: (compares, callback) ->
-    defer = mr.Deferred()
-    defer.done callback
+    defer = mr.Deferred().done callback
 
     comparisons = Viff.comparisons(compares)
     returned = 0

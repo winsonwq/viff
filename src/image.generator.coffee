@@ -3,7 +3,7 @@ _ = require 'underscore'
 mr = require 'Mr.Async'
 fs = require 'fs'
 wrench = require 'wrench'
-EventEmitter = require('events').EventEmitter
+{EventEmitter} = require('events')
 
 preprocessFolderName = (name) ->
   encodeURIComponent name

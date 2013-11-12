@@ -1,6 +1,7 @@
 sinon = require 'sinon'
 _ = require 'underscore'
 mr = require 'Mr.Async'
+Comparison = require '../../lib/comparison.js'
 require('chai').should()
 
 Viff = require '../../lib/viff.js'
@@ -36,9 +37,21 @@ module.exports =
     sinon.stub(@mrThen, 'then').yields 'base64string', 1000, 'base64string2', 2000
 
     @links = ['/404.html', '/strict-mode']
+
+    # for comparison
+
+    @diffObj =
+      isSameDimensions: true
+      misMatchPercentage: "2.84"
+      analysisTime: 54
+      getImageDataUrl: () ->
+        'ABCD'
+
+    sinon.stub(Comparison, 'compare').callsArgWith 2, @diffObj
+
     callback()
   tearDown: (callback) ->
-    for method in [@viff.builder.build, @thenObj.then, mr.when, @mrThen.then]
+    for method in [@viff.builder.build, @thenObj.then, mr.when, @mrThen.then, Comparison.compare]
       method.restore() 
 
     callback()
