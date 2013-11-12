@@ -1,6 +1,8 @@
-Viff = require '../../lib/viff.js'
 sinon = require 'sinon'
 _ = require 'underscore'
+require('chai').should()
+
+Viff = require '../../lib/viff.js'
 webdriver = require 'selenium-webdriver'
 
 module.exports = 
@@ -228,6 +230,13 @@ module.exports =
 
   'it should return correct path key for testcase when set description' : (test) ->
     test.equals 'this is testcase description', Viff.getPathKey { 'this is testcase description' : '/' }
+    test.done()
+
+
+  'it should construct cases': (test) ->
+    cases = @viff.constructCases(@config.browsers, @config.compare, @links)
+    cases.length.should.equal 4
+    _.first(cases).browser.should.equal 'safari'
     test.done()
 
 

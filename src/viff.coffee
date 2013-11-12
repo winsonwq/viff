@@ -33,7 +33,6 @@ class Viff extends EventEmitter
     envName = _.first(envName for envName of envHost)
     [parsedUrl, selector, preHandle] = Viff.parseUrl url
 
-
     driver.get envHost[envName] + parsedUrl
     preHandle driver, webdriver if _.isFunction preHandle
 
@@ -52,6 +51,23 @@ class Viff extends EventEmitter
       defer.resolve ''
 
     defer.promise()
+
+  constructCases: (browsers, envHosts, links) ->
+    cases = []
+    _.each browsers, (browser) ->
+      _.each links, (url) ->
+        [envFrom, envTo] = _.keys envHosts
+        [envFromPath, envToPath] = _.values envHosts
+
+        cases.push 
+          browser: browser
+          url: url
+          envFrom: envFrom
+          envTo: envTo
+          envFromPath: envFromPath
+          envToPath: envToPath
+
+    cases
 
   takeScreenshots: (browsers, envHosts, links, callback) ->
     defer = mr.Deferred()
@@ -78,11 +94,13 @@ class Viff extends EventEmitter
             _.extend(envCompares, envHost)
 
             if _.isEqual _.keys(envCompares), _.keys(envHosts)
+              # fail to take the screenshot
               unless _.contains _.values(envCompares), ''
-                compares[browser][path] = new Comparison(envCompares) 
+                compares[browser][path] = new Comparison(envCompares)
               returned++
 
             if _.isEqual links.length, _.keys(compares[browser]).length
+              # quit with all testcases are done for current browser
               that.drivers[browser].quit()
 
             if returned == total
