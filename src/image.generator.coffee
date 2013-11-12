@@ -53,7 +53,7 @@ _.extend ImageGenerator,
     ImageGenerator.emit ImageGenerator.CREATE_FILE, reportJsonPath
 
   generate: (reportObj) -> 
-    throw new Error('compares cannot be null.') if reportObj is null
+    throw new Error('report object cannot be null.') if reportObj is null
 
     reportObj = _.clone reportObj
     screenshotPath = path.join currentRunningDirname, './screenshots'

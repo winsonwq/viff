@@ -20,10 +20,7 @@ class Viff extends EventEmitter
   takeScreenshot: (browserName, envHost, url, callback) -> 
 
     that = @
-    defer = mr.Deferred()
-    
-    defer.done (base64Img, duration) => @emit 'tookScreenshot', browserName, envHost, url, duration, base64Img
-    defer.done(callback)
+    defer = mr.Deferred().done(callback)
     
     unless driver = @drivers[browserName]
       @builder = @builder.withCapabilities { browserName: browserName }
@@ -37,13 +34,12 @@ class Viff extends EventEmitter
     preHandle driver, webdriver if _.isFunction preHandle
 
     driver.call( ->
-      startDate = Date.now()
       driver.takeScreenshot().then (base64Img) -> 
         if _.isString selector
           Viff.dealWithPartial base64Img, driver, selector, (partialBase64Img) ->
-            defer.resolve partialBase64Img, Date.now() - startDate
+            defer.resolve partialBase64Img
         else 
-          defer.resolve base64Img, Date.now() - startDate
+          defer.resolve base64Img
 
       return
     ).addErrback (ex) ->
@@ -84,15 +80,17 @@ class Viff extends EventEmitter
       iterator = this
 
       path = Viff.getPathKey c.url
+      start = Date.now()
       compares[c.browser] = compares[c.browser] || {}
 
-      mr.when.apply(mr, that.caseShot(c)).then (fromImage, fromDuration, toImage, toDuration) ->
+      mr.when.apply(mr, that.caseShot(c)).then (fromImage, toImage) ->
         imgWithEnvs = _.object [[c.fromname, fromImage], [c.toname, toImage]]
         comparison = new Comparison imgWithEnvs
         
         comparison.diff (diffImg) ->
-          compares[c.browser][path] = comparison
+          compares[c.browser][path] = c.result = comparison
           that.drivers[c.browser].quit() if links.length == _.keys(compares[c.browser]).length
+          that.emit 'afterEach', c, Date.now() - start
           iterator.next()
         
     , -> defer.resolve compares).start()

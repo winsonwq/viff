@@ -133,7 +133,7 @@ module.exports =
 
     @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
 
-  'it should take fire many times `tookScreenshot` handler': (test) ->
+  'it should take fire many times `afterEach` handler': (test) ->
     format = 
       safari:
         '/404.html': {}
@@ -142,11 +142,11 @@ module.exports =
         '/404.html': {}
         '/strict-mode': {}
 
-    tookScreenshotHandler = sinon.spy()
-    @viff.on 'tookScreenshot', tookScreenshotHandler
+    afterEachHandler = sinon.spy()
+    @viff.on 'afterEach', afterEachHandler
 
     callback = (compares) -> 
-      test.equals tookScreenshotHandler.callCount, 8
+      test.equals afterEachHandler.callCount, 4
       test.done()
     
     @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
@@ -195,20 +195,13 @@ module.exports =
     test.ok preHandler.calledWith @driver, webdriver
     test.done()
 
-  'it should fire testcase `tookScreenshot` hook': (test) ->
-    envHost = 
-      build: 'http://localhost:4000'
+  'it should fire testcase `afterEach` hook': (test) ->
+    links = ['/404.html']
+    @viff.once 'afterEach', (c, duration) -> 
+      test.equals c.browser, 'safari'
+      test.equals c.url, '/404.html'
 
-    link = ['/path', ->]
-
-    @viff.on 'tookScreenshot', (browserName, host, url, duration, base64Img) ->
-      test.equals browserName, 'firefox'
-      test.equals host, envHost
-      test.equals url, link
-      test.equals base64Img, 'base64string'
-      test.done() 
-    
-    @viff.takeScreenshot('firefox', envHost, link)
+    @viff.takeScreenshots @config.browsers, @config.compare, links, -> test.done()
 
   'it should parse correct url info when only set path': (test) ->
     [url, selector, preHandler] = Viff.parseUrl '/'

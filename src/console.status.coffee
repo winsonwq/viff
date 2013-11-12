@@ -8,15 +8,15 @@ module.exports = (viff) ->
   caseDuration = 0
 
   console.log 'Viff is taking screenshots...'
-  viff.on 'tookScreenshot', (browserName, envHost, url, druation, base64Img) ->
-    if currentBrowserName isnt browserName
-      currentBrowserName = browserName
+  viff.on 'afterEach', (c, duration) ->
+    if currentBrowserName isnt c.browser
+      currentBrowserName = c.browser
       console.log "#{currentBrowserName.info}"
 
-    caseName = Viff.getPathKey url
-    caseDuration += druation
+    caseName = Viff.getPathKey c.url
+    caseDuration += duration
 
     if currentCaseName isnt caseName
-      console.log "  #{Viff.getPathKey url} (#{caseDuration}ms)"
+      console.log "  #{Viff.getPathKey c.url} (#{duration}ms)"
       currentCaseName = caseName
       caseDuration = 0
