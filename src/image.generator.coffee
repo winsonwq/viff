@@ -5,10 +5,14 @@ fs = require 'fs'
 wrench = require 'wrench'
 {EventEmitter} = require('events')
 
+Viff = require './viff'
+
 preprocessFolderName = (name) ->
   encodeURIComponent name
 
 currentRunningDirname = process.cwd()
+screenshotPath = path.join currentRunningDirname, './screenshots'
+reportJsonPath = path.join currentRunningDirname, './report.json'
 
 events = 
   CREATE_FOLDER: 'createFolder'
@@ -30,8 +34,9 @@ _.extend ImageGenerator,
     ImageGenerator.emit ImageGenerator.CREATE_FILE, imagePath      
 
   createFolder: (folderPath) ->
-    fs.mkdirSync folderPath
-    ImageGenerator.emit ImageGenerator.CREATE_FOLDER, folderPath        
+    unless fs.existsSync folderPath
+      fs.mkdirSync folderPath
+      ImageGenerator.emit ImageGenerator.CREATE_FOLDER, folderPath        
 
   generateFoldersAndImages: (basePath, compares) ->
     # would modify the compares object
@@ -52,14 +57,47 @@ _.extend ImageGenerator,
     fs.writeFileSync reportJsonPath, JSON.stringify reportObj
     ImageGenerator.emit ImageGenerator.CREATE_FILE, reportJsonPath
 
+  reset: -> ImageGenerator.resetFolderAndFile screenshotPath, reportJsonPath
+
+  generateByCase: (c) ->
+    browserFolderPath = path.join screenshotPath, c.browser
+    urlFolderPath = path.join browserFolderPath, preprocessFolderName(c.url)
+
+    ImageGenerator.createFolder browserFolderPath
+    ImageGenerator.createFolder urlFolderPath
+
+    _.each c.result.images, (base64Img, env) ->
+      imagePath = path.join(urlFolderPath, env + '.png')
+      ImageGenerator.createImageFile imagePath, base64Img
+      c.result.images[env] = path.relative currentRunningDirname, imagePath
+
+  generateReport: (cases) ->
+    compares = {}
+    differences = []
+    totalAnalysisTime = 0
+
+    _.each cases, (c) ->
+      path = Viff.getPathKey c.url
+      compares[c.browser] = compares[c.browser] || {}
+      compares[c.browser][path] = c.result
+
+      differences.push c if c.result.misMatchPercentage isnt 0
+      totalAnalysisTime += c.result.analysisTime
+
+    reportObj = 
+      compares: compares
+      caseCount: cases.length
+      sameCount: cases.length - differences.length
+      diffCount: differences.length
+      totalAnalysisTime: totalAnalysisTime 
+
+    ImageGenerator.generateReportJsonFile reportJsonPath, reportObj
+
   generate: (reportObj) -> 
     throw new Error('report object cannot be null.') if reportObj is null
 
     reportObj = _.clone reportObj
-    screenshotPath = path.join currentRunningDirname, './screenshots'
-    reportJsonPath = path.join currentRunningDirname, './report.json'
-
-    ImageGenerator.resetFolderAndFile screenshotPath, reportJsonPath
+    ImageGenerator.reset()
     ImageGenerator.generateFoldersAndImages screenshotPath, reportObj.compares
     ImageGenerator.generateReportJsonFile reportJsonPath, reportObj
 

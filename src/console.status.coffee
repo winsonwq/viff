@@ -17,6 +17,6 @@ module.exports = (viff) ->
     caseDuration += duration
 
     if currentCaseName isnt caseName
-      console.log "  #{Viff.getPathKey c.url} (#{duration}ms)"
+      console.log "#{Viff.getPathKey c.url} (#{duration}ms)"
       currentCaseName = caseName
       caseDuration = 0

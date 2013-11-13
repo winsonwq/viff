@@ -84,6 +84,8 @@ module.exports =
     test.done()
 
   'it should generate correct directories': (test) ->
+    @existsSync = @existsSync.returns false
+
     ImageGenerator.generate @reporterObj
     test.equals @mkdirSync.callCount, 6
     test.ok @mkdirSync.getCall(1).args[0].indexOf('/viff/screenshots/firefox/%2F404.html%3Fa%3D1') >= 0
@@ -116,6 +118,7 @@ module.exports =
     createFolderCallback = sinon.spy()
     ImageGenerator.on ImageGenerator.CREATE_FOLDER, createFolderCallback
 
+    @existsSync.returns false
     ImageGenerator.generate @reporterObj
     
     test.ok createFolderCallback.getCall(0).args[0].indexOf('/viff/screenshots') >= 0
@@ -135,5 +138,32 @@ module.exports =
     test.ok createFileCallback.getCall(0).args[0].indexOf('/viff/screenshots/firefox/%2F404.html%3Fa%3D1/build.png') >= 0
     test.ok createFileCallback.getCall(6).args[0].indexOf('/viff/screenshots/chrome/%2F404.html/build.png') >= 0
     test.ok createFileCallback.lastCall.args[0].indexOf('/viff/report.json') >= 0
+    test.done()
+
+  'it could generate images by case': (test) ->
+    c = 
+      browser: 'firefox'
+      url: '/link1'
+      fromname: 'build'
+      toname: 'prod'
+      from: { 'build': 'http://localhost:4000' }
+      to: { 'prod': 'http://localhost:4001' }
+      result:
+        images:
+          build: 'ABCD'
+          prod: 'EFGH'
+          diff: 'IJKL'
+        isSameDimensions: true
+        misMatchPercentage: 0.2
+        analysisTime: 2000
+    
+    @existsSync = @existsSync.returns false
+
+    ImageGenerator.generateByCase c
+
+    test.ok @mkdirSync.firstCall.args[0].indexOf('/viff/screenshots/firefox') >= 0
+    test.ok @mkdirSync.secondCall.args[0].indexOf('/viff/screenshots/firefox/%2Flink1') >= 0
+    test.equals @writeFileSync.callCount, 3
+    test.ok @writeFileSync.firstCall.args[0].indexOf('/viff/screenshots/firefox/%2Flink1/build.png') >= 0
     test.done()
 

@@ -44,8 +44,7 @@ module.exports =
       isSameDimensions: true
       misMatchPercentage: "2.84"
       analysisTime: 54
-      getImageDataUrl: () ->
-        'ABCD'
+      getImageDataUrl: () -> 'ABCD'
 
     sinon.stub(Comparison, 'compare').callsArgWith 2, @diffObj
 
@@ -268,7 +267,6 @@ module.exports =
   'it should return correct path key for testcase when set description' : (test) ->
     test.equals 'this is testcase description', Viff.getPathKey { 'this is testcase description' : '/' }
     test.done()
-
 
   'it should construct cases': (test) ->
     cases = @viff.constructCases(@config.browsers, @config.compare, @links)

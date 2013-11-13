@@ -36,12 +36,6 @@ class Reporter
     return JSON.stringify(reportObj) if format is 'json'
 
     if format is 'file'
-      ImageGenerator.on ImageGenerator.CREATE_FOLDER, (folerPath) ->
-        console.log "#{ 'viff'.greyColor } #{ 'create'.info } #{ 'folder'.prompt } #{folerPath}"
-
-      ImageGenerator.on ImageGenerator.CREATE_FILE, (filePath) ->
-        console.log "#{ 'viff'.greyColor } #{ 'create'.info } #{ ' file '.prompt } #{filePath}"
-
       ImageGenerator.generate reportObj
       return ''
 
