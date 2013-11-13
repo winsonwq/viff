@@ -14,15 +14,12 @@ module.exports = function(grunt) {
           'lib/viff.js': 'src/viff.coffee',
           'lib/comparison.js': 'src/comparison.coffee',
           'lib/index.js': 'src/index.coffee',
-          'lib/reporter.js': 'src/reporter.coffee',
           'lib/color.helper.js': 'src/color.helper.coffee',
-          'lib/html.report.template.js': 'src/html.report.template.coffee',
           'lib/process.argv.js': 'src/process.argv.coffee',
           'lib/image.generator.js': 'src/image.generator.coffee',
           'lib/console.status.js': 'src/console.status.coffee',
           'test/build/comparison_test.js': 'test/src/comparison_test.coffee',
           'test/build/viff_test.js': 'test/src/viff_test.coffee',
-          'test/build/reporter_test.js': 'test/src/reporter_test.coffee',
           'test/build/process_argv_test.js': 'test/src/process_argv_test.coffee',
           'test/build/image_generator_test.js': 'test/src/image_generator_test.coffee'
         }

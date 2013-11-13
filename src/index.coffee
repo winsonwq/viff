@@ -2,7 +2,6 @@ _ = require 'underscore'
 require 'webdriver-helper'
 
 Viff = require './viff.js'
-Reporter = require './reporter.js'
 processArgs = require './process.argv.js'
 consoleStatus = require './console.status.js'
 imgGen = require './image.generator'
