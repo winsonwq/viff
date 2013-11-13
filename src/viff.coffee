@@ -77,11 +77,12 @@ class Viff extends EventEmitter
     compares = {}
 
     that.emit 'before', cases
+    start = Date.now()
     mr.asynEach(cases, (c) ->
       iterator = this
 
       path = Viff.getPathKey c.url
-      start = Date.now()
+      startcase = Date.now()
       compares[c.browser] = compares[c.browser] || {}
 
       mr.when.apply(mr, that.caseShot(c)).then (fromImage, toImage) ->
@@ -91,10 +92,13 @@ class Viff extends EventEmitter
         comparison.diff (diffImg) ->
           compares[c.browser][path] = c.result = comparison
           that.drivers[c.browser].quit() if links.length == _.keys(compares[c.browser]).length
-          that.emit 'afterEach', c, Date.now() - start
+          that.emit 'afterEach', c, Date.now() - startcase
           iterator.next()
         
-    , -> defer.resolve compares).start()
+    , -> 
+      that.emit 'after', cases, Date.now() - start
+      defer.resolve compares
+    ).start()
 
     defer.promise()
 

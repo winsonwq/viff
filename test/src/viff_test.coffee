@@ -153,6 +153,16 @@ module.exports =
     
     @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
 
+  'it should take fire only once `after` handler': (test) ->
+    beforeHandler = sinon.spy()
+    @viff.on 'before', beforeHandler
+
+    callback = (compares) -> 
+      test.equals beforeHandler.callCount, 1
+      test.done()
+    
+    @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
+
   'it should diff all screenshot': (test) ->
     compare = { diff: -> }
     compares = 
@@ -208,6 +218,13 @@ module.exports =
   'it should fire testcase `before` hook': (test) ->
     links = ['/404.html']
     @viff.once 'before', (cases) -> 
+      test.equals cases.length, 2
+
+    @viff.takeScreenshots @config.browsers, @config.compare, links, -> test.done()
+
+  'it should fire testcase `after` hook': (test) ->
+    links = ['/404.html']
+    @viff.once 'after', (cases) -> 
       test.equals cases.length, 2
 
     @viff.takeScreenshots @config.browsers, @config.compare, links, -> test.done()
