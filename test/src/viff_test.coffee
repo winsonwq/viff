@@ -134,19 +134,21 @@ module.exports =
     @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
 
   'it should take fire many times `afterEach` handler': (test) ->
-    format = 
-      safari:
-        '/404.html': {}
-        '/strict-mode': {}
-      firefox:
-        '/404.html': {}
-        '/strict-mode': {}
-
     afterEachHandler = sinon.spy()
     @viff.on 'afterEach', afterEachHandler
 
     callback = (compares) -> 
       test.equals afterEachHandler.callCount, 4
+      test.done()
+    
+    @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
+
+  'it should take fire only once `before` handler': (test) ->
+    beforeHandler = sinon.spy()
+    @viff.on 'before', beforeHandler
+
+    callback = (compares) -> 
+      test.equals beforeHandler.callCount, 1
       test.done()
     
     @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
@@ -200,6 +202,13 @@ module.exports =
     @viff.once 'afterEach', (c, duration) -> 
       test.equals c.browser, 'safari'
       test.equals c.url, '/404.html'
+
+    @viff.takeScreenshots @config.browsers, @config.compare, links, -> test.done()
+
+  'it should fire testcase `before` hook': (test) ->
+    links = ['/404.html']
+    @viff.once 'before', (cases) -> 
+      test.equals cases.length, 2
 
     @viff.takeScreenshots @config.browsers, @config.compare, links, -> test.done()
 

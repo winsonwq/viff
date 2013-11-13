@@ -76,6 +76,7 @@ class Viff extends EventEmitter
     that = this
     compares = {}
 
+    that.emit 'before', cases
     mr.asynEach(cases, (c) ->
       iterator = this
 
