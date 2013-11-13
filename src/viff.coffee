@@ -37,9 +37,9 @@ class Viff extends EventEmitter
       driver.takeScreenshot().then (base64Img) -> 
         if _.isString selector
           Viff.dealWithPartial base64Img, driver, selector, (partialBase64Img) ->
-            defer.resolve partialBase64Img
+            defer.resolve partialBase64Img, null
         else 
-          defer.resolve base64Img
+          defer.resolve base64Img, null
 
       return
     ).addErrback (ex) ->
@@ -64,12 +64,6 @@ class Viff extends EventEmitter
 
     cases
 
-  caseShot: (_case) ->
-    fromDefer = @takeScreenshot _case.browser, _case.from, _case.url
-    toDefer = @takeScreenshot _case.browser, _case.to, _case.url
-
-    [fromDefer, toDefer]
-
   takeScreenshots: (browsers, envHosts, links, callback) ->
     defer = mr.Deferred().done callback
     cases = @constructCases browsers, envHosts, links
@@ -78,23 +72,30 @@ class Viff extends EventEmitter
 
     that.emit 'before', cases
     start = Date.now()
-    mr.asynEach(cases, (c) ->
+    mr.asynEach(cases, (_case) ->
       iterator = this
 
-      path = Viff.getPathKey c.url
+      path = Viff.getPathKey _case.url
       startcase = Date.now()
-      compares[c.browser] = compares[c.browser] || {}
+      compares[_case.browser] = compares[_case.browser] || {}
 
-      mr.when.apply(mr, that.caseShot(c)).then (fromImage, toImage) ->
-        imgWithEnvs = _.object [[c.fromname, fromImage], [c.toname, toImage]]
-        comparison = new Comparison imgWithEnvs
-        
-        comparison.diff (diffImg) ->
-          compares[c.browser][path] = c.result = comparison
-          that.drivers[c.browser].quit() if links.length == _.keys(compares[c.browser]).length
-          that.emit 'afterEach', c, Date.now() - startcase
-          iterator.next()
-        
+      that.takeScreenshot _case.browser, _case.from, _case.url, (fromImage, fromImgEx) ->
+        that.takeScreenshot _case.browser, _case.to, _case.url, (toImage, toImgEx) ->
+
+          if fromImgEx isnt null or toImgEx isnt null
+            compares[_case.browser][path] = _case.result = null
+            that.emit 'afterEach', _case, 0
+            iterator.next()
+          else 
+            imgWithEnvs = _.object [[_case.fromname, fromImage], [_case.toname, toImage]]
+            comparison = new Comparison imgWithEnvs
+            
+            comparison.diff (diffImg) ->
+              compares[_case.browser][path] = _case.result = comparison
+              that.drivers[_case.browser].quit() if links.length == _.keys(compares[_case.browser]).length
+              that.emit 'afterEach', _case, Date.now() - startcase
+
+            iterator.next()
     , -> 
       that.emit 'after', cases, Date.now() - start
       defer.resolve compares

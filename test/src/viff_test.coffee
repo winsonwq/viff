@@ -34,7 +34,7 @@ module.exports =
 
     @mrThen = then: ->
     sinon.stub(mr, 'when').returns @mrThen
-    sinon.stub(@mrThen, 'then').yields 'base64string', 1000, 'base64string2', 2000
+    sinon.stub(@mrThen, 'then').yields 'base64string', null, 'base64string2', null
 
     @links = ['/404.html', '/strict-mode']
 

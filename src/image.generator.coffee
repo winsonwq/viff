@@ -8,7 +8,7 @@ wrench = require 'wrench'
 Viff = require './viff'
 
 preprocessFolderName = (name) ->
-  encodeURIComponent name
+  encodeURIComponent Viff.getPathKey name
 
 currentRunningDirname = process.cwd()
 screenshotPath = path.join currentRunningDirname, './screenshots'
@@ -59,30 +59,33 @@ _.extend ImageGenerator,
 
   reset: -> ImageGenerator.resetFolderAndFile screenshotPath, reportJsonPath
 
-  generateByCase: (c) ->
-    browserFolderPath = path.join screenshotPath, c.browser
-    urlFolderPath = path.join browserFolderPath, preprocessFolderName(c.url)
+  generateByCase: (_case) ->
+    browserFolderPath = path.join screenshotPath, _case.browser
+    urlFolderPath = path.join browserFolderPath, preprocessFolderName(_case.url)
 
     ImageGenerator.createFolder browserFolderPath
     ImageGenerator.createFolder urlFolderPath
 
-    _.each c.result.images, (base64Img, env) ->
+    _.each _case.result.images, (base64Img, env) ->
       imagePath = path.join(urlFolderPath, env + '.png')
       ImageGenerator.createImageFile imagePath, base64Img
-      c.result.images[env] = path.relative currentRunningDirname, imagePath
+      _case.result.images[env] = path.relative currentRunningDirname, imagePath
 
   generateReport: (cases) ->
     compares = {}
     differences = []
     totalAnalysisTime = 0
 
-    _.each cases, (c) ->
-      path = Viff.getPathKey c.url
-      compares[c.browser] = compares[c.browser] || {}
-      compares[c.browser][path] = c.result
+    _.each cases, (_case) ->
+      if _case.result
+        path = Viff.getPathKey _case.url
+        compares[_case.browser] = compares[_case.browser] || {}
+        compares[_case.browser][path] = _case.result
 
-      differences.push c if c.result.misMatchPercentage isnt 0
-      totalAnalysisTime += c.result.analysisTime
+        differences.push _case if _case.result.misMatchPercentage isnt 0
+        totalAnalysisTime += _case.result.analysisTime
+      else
+        differences.push _case
 
     reportObj = 
       compares: compares

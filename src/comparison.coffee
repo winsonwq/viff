@@ -2,7 +2,7 @@ path = require 'path'
 _ = require 'underscore'
 mr = require 'Mr.Async'
 fs = require('fs')
-resemble = require('resemble').resemble
+{resemble} = require 'resemble'
 
 class Comparison
   constructor: (imgWithEnvs) ->
