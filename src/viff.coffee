@@ -70,7 +70,7 @@ class Viff extends EventEmitter
     that = this
     compares = {}
 
-    that.emit 'before', cases
+    @emit 'before', cases
     start = Date.now()
     mr.asynEach(cases, (_case) ->
       iterator = this

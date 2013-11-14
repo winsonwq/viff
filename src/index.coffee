@@ -12,13 +12,11 @@ return console.log config if _.isString config
 
 viff = new Viff config.seleniumHost
 
-viff.takeScreenshots(config.browsers, config.envHosts, config.paths);
-
 if config.reportFormat == 'file'
   consoleStatus viff
 
   # clean the images and report.json
-  viff.on 'before', (cases) -> imgGen.reset()
+  viff.on 'before', (cases) ->  imgGen.reset();
 
   # generate images by each case
   viff.on 'afterEach', (_case, duration) -> imgGen.generateByCase _case if duration != 0
@@ -26,3 +24,4 @@ if config.reportFormat == 'file'
   # generate report.json  
   viff.on 'after', (cases, duration) -> imgGen.generateReport cases
   
+viff.takeScreenshots(config.browsers, config.envHosts, config.paths);
