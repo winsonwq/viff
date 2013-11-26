@@ -12,12 +12,14 @@ class Comparison
     defer = mr.Deferred().done callback
 
     that = @
-    fileData = _.map _.values(@images), (base64Img) ->
-      new Buffer base64Img, 'base64'
+    fileData = _.values(@images)
 
     Comparison.compare fileData[0], fileData[1], (diffObj) -> 
+      
       if diffObj
-        that.images.diff = diffObj.getImageDataUrl().replace('data:image/png;base64,', '')
+        diffBase64 = diffObj.getImageDataUrl().replace('data:image/png;base64,', '')
+        that.images.diff = new Buffer diffBase64, 'base64'
+
         _.extend that, 
           isSameDimensions: diffObj.isSameDimensions
           misMatchPercentage: Number diffObj.misMatchPercentage    
