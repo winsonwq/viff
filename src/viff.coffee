@@ -37,9 +37,9 @@ class Viff extends EventEmitter
       driver.takeScreenshot().then (base64Img) -> 
         if _.isString selector
           Viff.dealWithPartial base64Img, driver, selector, (partialBase64Img) ->
-            defer.resolve partialBase64Img, null
+            defer.resolve new Buffer(partialBase64Img, 'base64'), null
         else 
-          defer.resolve base64Img, null
+          defer.resolve new Buffer(base64Img, 'base64'), null
 
       return
     ).addErrback (ex) ->
@@ -97,8 +97,9 @@ class Viff extends EventEmitter
 
             iterator.next()
     , -> 
-      that.emit 'after', cases, Date.now() - start
-      defer.resolve compares
+      endTime = Date.now() - start
+      that.emit 'after', cases, endTime
+      defer.resolve cases, endTime
     ).start()
 
     defer.promise()
@@ -126,25 +127,6 @@ class Viff extends EventEmitter
           defer.resolve cvs.toBuffer().toString('base64')
 
     defer.promise()
-
-  @diff: (compares, callback) ->
-    defer = mr.Deferred().done callback
-
-    comparisons = Viff.comparisons(compares)
-    returned = 0
-    _.each comparisons, (comparison) ->
-      comparison.diff (diffImgBase64) ->
-        defer.resolve(compares) if returned++ == comparisons.length - 1
-
-    defer.promise()
-
-  @comparisons: (compares) ->
-    ret = []
-    _.each compares, (urls, browserName) -> 
-      _.each urls, (comparison, url) ->
-        ret.push comparison
-
-    ret
 
   @parseUrl = (urlInfo) ->
     if Object.prototype.toString.call(urlInfo) is '[object Object]'

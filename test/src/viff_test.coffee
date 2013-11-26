@@ -32,10 +32,6 @@ module.exports =
     sinon.stub(@viff.builder, 'build').returns(@driver)
     sinon.stub(@thenObj, 'then').yields 'base64string'
 
-    @mrThen = then: ->
-    sinon.stub(mr, 'when').returns @mrThen
-    sinon.stub(@mrThen, 'then').yields 'base64string', null, 'base64string2', null
-
     @links = ['/404.html', '/strict-mode']
 
     # for comparison
@@ -50,7 +46,7 @@ module.exports =
 
     callback()
   tearDown: (callback) ->
-    for method in [@viff.builder.build, @thenObj.then, mr.when, @mrThen.then, Comparison.compare]
+    for method in [@viff.builder.build, @thenObj.then, Comparison.compare]
       method.restore() 
 
     callback()
@@ -82,7 +78,7 @@ module.exports =
     callback = sinon.spy()
     @viff.takeScreenshot('firefox', envHost, @links.first, callback)
 
-    test.ok callback.calledWith 'base64string'
+    test.equals callback.firstCall.args[0].toString('base64'), 'base64string'
     test.done()
 
   'it should invoke pre handler before take screenshot': (test) ->
@@ -99,8 +95,8 @@ module.exports =
 
   'it should use correct path when set pre handler': (test) ->
     links = [['/404.html', (driver, webdriver) -> ]]
-    callback = (compares) -> 
-      test.equals _.first(_.keys(compares.firefox)), '/404.html'
+    callback = (cases) -> 
+      test.equals _.first(cases).url[0], '/404.html'
       test.done()
     @viff.takeScreenshots @config.browsers, @config.compare, links, callback
 
@@ -108,10 +104,11 @@ module.exports =
     links = [['/404.html', '#page', (driver, webdriver) -> ]]
     sinon.stub(Viff, 'dealWithPartial').callsArgWith(3, 'partialBase64Img');
 
-    callback = (compares) -> 
+    callback = (cases) -> 
       Viff.dealWithPartial.restore()
       
-      test.equals _.first(_.keys(compares.firefox)), '/404.html (#page)'
+      test.equals _.first(cases).url[0], '/404.html'
+      test.equals _.first(cases).url[1], '#page'
       test.done()
 
     @viff.takeScreenshots @config.browsers, @config.compare, links, callback
@@ -125,9 +122,9 @@ module.exports =
         '/404.html': {}
         '/strict-mode': {}
 
-    callback = (compares) -> 
-      test.ok _.isEqual _.keys(format), _.keys(compares)
-      test.ok _.isEqual _.keys(compares.safari), _.keys(compares.firefox)
+    callback = (cases) ->
+      test.equals cases.length, 4
+      test.equals _.first(cases).url, '/404.html'
       test.done()
 
     @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
@@ -161,22 +158,6 @@ module.exports =
       test.done()
     
     @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
-
-  'it should diff all screenshot': (test) ->
-    compare = { diff: -> }
-    compares = 
-      safari:
-        '/404.html': compare
-        '/strict-mode': compare
-      firefox:
-        '/404.html': compare
-        '/strict-mode': compare
-
-    diff = sinon.spy(compare, 'diff')
-
-    Viff.diff compares
-    test.equals diff.callCount, 4
-    test.done()
 
   'it should take partial screenshot according to selecor': (test) ->
     envHost = 

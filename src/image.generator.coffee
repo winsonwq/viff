@@ -29,29 +29,14 @@ _.extend ImageGenerator,
     wrench.mkdirSyncRecursive screenshotPath
     ImageGenerator.emit ImageGenerator.CREATE_FOLDER, screenshotPath
 
-  createImageFile: (imagePath, base64Img) ->
-    fs.writeFileSync imagePath, new Buffer(base64Img, 'base64')
+  createImageFile: (imagePath, img) ->
+    fs.writeFileSync imagePath, img
     ImageGenerator.emit ImageGenerator.CREATE_FILE, imagePath      
 
   createFolder: (folderPath) ->
     unless fs.existsSync folderPath
       fs.mkdirSync folderPath
       ImageGenerator.emit ImageGenerator.CREATE_FOLDER, folderPath        
-
-  generateFoldersAndImages: (basePath, compares) ->
-    # would modify the compares object
-    _.each compares, (urls, browser) ->
-      browserFolderPath = path.join basePath, browser
-      ImageGenerator.createFolder browserFolderPath
-
-      _.each urls, (properties, url) ->
-        urlFolderPath = path.join browserFolderPath, preprocessFolderName(url)
-        ImageGenerator.createFolder urlFolderPath
-
-        _.each properties.images, (base64Img, env) ->
-          imagePath = path.join(urlFolderPath, env + '.png')
-          ImageGenerator.createImageFile imagePath, base64Img
-          properties.images[env] = path.relative currentRunningDirname, imagePath
 
   generateReportJsonFile: (reportJsonPath, reportObj) ->
     fs.writeFileSync reportJsonPath, JSON.stringify reportObj
@@ -66,11 +51,11 @@ _.extend ImageGenerator,
     ImageGenerator.createFolder browserFolderPath
     ImageGenerator.createFolder urlFolderPath
 
-    _.each _case.result.images, (base64Img, env) ->
+    _.each _case.result.images, (img, env) ->
       imagePath = path.join(urlFolderPath, env + '.png')
-      ImageGenerator.createImageFile imagePath, base64Img
+      ImageGenerator.createImageFile imagePath, img
       _case.result.images[env] = path.relative currentRunningDirname, imagePath
-
+    
   generateReport: (cases) ->
     compares = {}
     differences = []
@@ -94,14 +79,6 @@ _.extend ImageGenerator,
       diffCount: differences.length
       totalAnalysisTime: totalAnalysisTime 
 
-    ImageGenerator.generateReportJsonFile reportJsonPath, reportObj
-
-  generate: (reportObj) -> 
-    throw new Error('report object cannot be null.') if reportObj is null
-
-    reportObj = _.clone reportObj
-    ImageGenerator.reset()
-    ImageGenerator.generateFoldersAndImages screenshotPath, reportObj.compares
     ImageGenerator.generateReportJsonFile reportJsonPath, reportObj
 
 module.exports = ImageGenerator
