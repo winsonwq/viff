@@ -25,7 +25,7 @@
     "node": ">0.8.0"
   },
   "dependencies": {
-    "Mr.Async": "latest",
+    "Mr.Async": "~0.3.1",
     "underscore": "*",
     "selenium-webdriver": ">=2.33.0",
     "handlebars": "~1.0.12", 
