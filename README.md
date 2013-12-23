@@ -81,6 +81,8 @@ repo for viff reporter is [ViffReport](https://github.com/xjsi/ViffReport)
 
 # History
 
+2013-11-13 **viff@0.6.1** optimise memory usage and only support `file` report format
+
 2013-10-30 **viff@0.5.0** add testcase running status in console.
 
 2013-10-27 **viff@0.4.2** won't stop testing if one of them fail.

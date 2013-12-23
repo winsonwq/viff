@@ -3,12 +3,16 @@ _ = require 'underscore'
 mr = require 'Mr.Async'
 fs = require 'fs'
 wrench = require 'wrench'
-EventEmitter = require('events').EventEmitter
+{EventEmitter} = require('events')
+
+Viff = require './viff'
 
 preprocessFolderName = (name) ->
-  encodeURIComponent name
+  encodeURIComponent Viff.getPathKey name
 
 currentRunningDirname = process.cwd()
+screenshotPath = path.join currentRunningDirname, './screenshots'
+reportJsonPath = path.join currentRunningDirname, './report.json'
 
 events = 
   CREATE_FOLDER: 'createFolder'
@@ -25,42 +29,56 @@ _.extend ImageGenerator,
     wrench.mkdirSyncRecursive screenshotPath
     ImageGenerator.emit ImageGenerator.CREATE_FOLDER, screenshotPath
 
-  createImageFile: (imagePath, base64Img) ->
-    fs.writeFileSync imagePath, new Buffer(base64Img, 'base64')
+  createImageFile: (imagePath, img) ->
+    fs.writeFileSync imagePath, img
     ImageGenerator.emit ImageGenerator.CREATE_FILE, imagePath      
 
   createFolder: (folderPath) ->
-    fs.mkdirSync folderPath
-    ImageGenerator.emit ImageGenerator.CREATE_FOLDER, folderPath        
-
-  generateFoldersAndImages: (basePath, compares) ->
-    # would modify the compares object
-    _.each compares, (urls, browser) ->
-      browserFolderPath = path.join basePath, browser
-      ImageGenerator.createFolder browserFolderPath
-
-      _.each urls, (properties, url) ->
-        urlFolderPath = path.join browserFolderPath, preprocessFolderName(url)
-        ImageGenerator.createFolder urlFolderPath
-
-        _.each properties.images, (base64Img, env) ->
-          imagePath = path.join(urlFolderPath, env + '.png')
-          ImageGenerator.createImageFile imagePath, base64Img
-          properties.images[env] = path.relative currentRunningDirname, imagePath
+    unless fs.existsSync folderPath
+      fs.mkdirSync folderPath
+      ImageGenerator.emit ImageGenerator.CREATE_FOLDER, folderPath        
 
   generateReportJsonFile: (reportJsonPath, reportObj) ->
     fs.writeFileSync reportJsonPath, JSON.stringify reportObj
     ImageGenerator.emit ImageGenerator.CREATE_FILE, reportJsonPath
 
-  generate: (reportObj) -> 
-    throw new Error('compares cannot be null.') if reportObj is null
+  reset: -> ImageGenerator.resetFolderAndFile screenshotPath, reportJsonPath
 
-    reportObj = _.clone reportObj
-    screenshotPath = path.join currentRunningDirname, './screenshots'
-    reportJsonPath = path.join currentRunningDirname, './report.json'
+  generateByCase: (_case) ->
+    browserFolderPath = path.join screenshotPath, _case.browser
+    urlFolderPath = path.join browserFolderPath, preprocessFolderName(_case.url)
 
-    ImageGenerator.resetFolderAndFile screenshotPath, reportJsonPath
-    ImageGenerator.generateFoldersAndImages screenshotPath, reportObj.compares
+    ImageGenerator.createFolder browserFolderPath
+    ImageGenerator.createFolder urlFolderPath
+
+    _.each _case.result.images, (img, env) ->
+      imagePath = path.join(urlFolderPath, env + '.png')
+      ImageGenerator.createImageFile imagePath, img
+      _case.result.images[env] = path.relative currentRunningDirname, imagePath
+    
+  generateReport: (cases) ->
+    compares = {}
+    differences = []
+    totalAnalysisTime = 0
+
+    _.each cases, (_case) ->
+      if _case.result
+        path = Viff.getPathKey _case.url
+        compares[_case.browser] = compares[_case.browser] || {}
+        compares[_case.browser][path] = _case.result
+
+        differences.push _case if _case.result.misMatchPercentage isnt 0
+        totalAnalysisTime += _case.result.analysisTime
+      else
+        differences.push _case
+
+    reportObj = 
+      compares: compares
+      caseCount: cases.length
+      sameCount: cases.length - differences.length
+      diffCount: differences.length
+      totalAnalysisTime: totalAnalysisTime 
+
     ImageGenerator.generateReportJsonFile reportJsonPath, reportObj
 
 module.exports = ImageGenerator

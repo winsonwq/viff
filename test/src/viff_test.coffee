@@ -1,6 +1,10 @@
-Viff = require '../../lib/viff.js'
 sinon = require 'sinon'
 _ = require 'underscore'
+mr = require 'Mr.Async'
+Comparison = require '../../lib/comparison.js'
+require('chai').should()
+
+Viff = require '../../lib/viff.js'
 webdriver = require 'selenium-webdriver'
 
 module.exports = 
@@ -29,9 +33,20 @@ module.exports =
     sinon.stub(@thenObj, 'then').yields 'base64string'
 
     @links = ['/404.html', '/strict-mode']
+
+    # for comparison
+
+    @diffObj =
+      isSameDimensions: true
+      misMatchPercentage: "2.84"
+      analysisTime: 54
+      getImageDataUrl: () -> 'ABCD'
+
+    sinon.stub(Comparison, 'compare').callsArgWith 2, @diffObj
+
     callback()
   tearDown: (callback) ->
-    for method in [@viff.builder.build, @thenObj.then]
+    for method in [@viff.builder.build, @thenObj.then, Comparison.compare]
       method.restore() 
 
     callback()
@@ -63,7 +78,7 @@ module.exports =
     callback = sinon.spy()
     @viff.takeScreenshot('firefox', envHost, @links.first, callback)
 
-    test.ok callback.calledWith 'base64string'
+    test.equals callback.firstCall.args[0].toString('base64'), 'base64string'
     test.done()
 
   'it should invoke pre handler before take screenshot': (test) ->
@@ -80,8 +95,8 @@ module.exports =
 
   'it should use correct path when set pre handler': (test) ->
     links = [['/404.html', (driver, webdriver) -> ]]
-    callback = (compares) -> 
-      test.equals _.first(_.keys(compares.firefox)), '/404.html'
+    callback = (cases) -> 
+      test.equals _.first(cases).url[0], '/404.html'
       test.done()
     @viff.takeScreenshots @config.browsers, @config.compare, links, callback
 
@@ -89,10 +104,11 @@ module.exports =
     links = [['/404.html', '#page', (driver, webdriver) -> ]]
     sinon.stub(Viff, 'dealWithPartial').callsArgWith(3, 'partialBase64Img');
 
-    callback = (compares) -> 
+    callback = (cases) -> 
       Viff.dealWithPartial.restore()
       
-      test.equals _.first(_.keys(compares.firefox)), '/404.html (#page)'
+      test.equals _.first(cases).url[0], '/404.html'
+      test.equals _.first(cases).url[1], '#page'
       test.done()
 
     @viff.takeScreenshots @config.browsers, @config.compare, links, callback
@@ -106,46 +122,42 @@ module.exports =
         '/404.html': {}
         '/strict-mode': {}
 
-    callback = (compares) -> 
-      test.ok _.isEqual _.keys(format), _.keys(compares)
-      test.ok _.isEqual _.keys(compares.safari), _.keys(compares.firefox)
+    callback = (cases) ->
+      test.equals cases.length, 4
+      test.equals _.first(cases).url, '/404.html'
       test.done()
 
     @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
 
-  'it should take fire many times `tookScreenshot` handler': (test) ->
-    format = 
-      safari:
-        '/404.html': {}
-        '/strict-mode': {}
-      firefox:
-        '/404.html': {}
-        '/strict-mode': {}
-
-    tookScreenshotHandler = sinon.spy()
-    @viff.on 'tookScreenshot', tookScreenshotHandler
+  'it should take fire many times `afterEach` handler': (test) ->
+    afterEachHandler = sinon.spy()
+    @viff.on 'afterEach', afterEachHandler
 
     callback = (compares) -> 
-      test.equals tookScreenshotHandler.callCount, 8
+      test.equals afterEachHandler.callCount, 4
       test.done()
     
     @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
 
-  'it should diff all screenshot': (test) ->
-    compare = { diff: -> }
-    compares = 
-      safari:
-        '/404.html': compare
-        '/strict-mode': compare
-      firefox:
-        '/404.html': compare
-        '/strict-mode': compare
+  'it should take fire only once `before` handler': (test) ->
+    beforeHandler = sinon.spy()
+    @viff.on 'before', beforeHandler
 
-    diff = sinon.spy(compare, 'diff')
+    callback = (compares) -> 
+      test.equals beforeHandler.callCount, 1
+      test.done()
+    
+    @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
 
-    Viff.diff compares
-    test.equals diff.callCount, 4
-    test.done()
+  'it should take fire only once `after` handler': (test) ->
+    beforeHandler = sinon.spy()
+    @viff.on 'before', beforeHandler
+
+    callback = (compares) -> 
+      test.equals beforeHandler.callCount, 1
+      test.done()
+    
+    @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
 
   'it should take partial screenshot according to selecor': (test) ->
     envHost = 
@@ -175,20 +187,27 @@ module.exports =
     test.ok preHandler.calledWith @driver, webdriver
     test.done()
 
-  'it should fire testcase `tookScreenshot` hook': (test) ->
-    envHost = 
-      build: 'http://localhost:4000'
+  'it should fire testcase `afterEach` hook': (test) ->
+    links = ['/404.html']
+    @viff.once 'afterEach', (c, duration) -> 
+      test.equals c.browser, 'safari'
+      test.equals c.url, '/404.html'
 
-    link = ['/path', ->]
+    @viff.takeScreenshots @config.browsers, @config.compare, links, -> test.done()
 
-    @viff.on 'tookScreenshot', (browserName, host, url, duration, base64Img) ->
-      test.equals browserName, 'firefox'
-      test.equals host, envHost
-      test.equals url, link
-      test.equals base64Img, 'base64string'
-      test.done() 
-    
-    @viff.takeScreenshot('firefox', envHost, link)
+  'it should fire testcase `before` hook': (test) ->
+    links = ['/404.html']
+    @viff.once 'before', (cases) -> 
+      test.equals cases.length, 2
+
+    @viff.takeScreenshots @config.browsers, @config.compare, links, -> test.done()
+
+  'it should fire testcase `after` hook': (test) ->
+    links = ['/404.html']
+    @viff.once 'after', (cases) -> 
+      test.equals cases.length, 2
+
+    @viff.takeScreenshots @config.browsers, @config.compare, links, -> test.done()
 
   'it should parse correct url info when only set path': (test) ->
     [url, selector, preHandler] = Viff.parseUrl '/'
@@ -228,6 +247,12 @@ module.exports =
 
   'it should return correct path key for testcase when set description' : (test) ->
     test.equals 'this is testcase description', Viff.getPathKey { 'this is testcase description' : '/' }
+    test.done()
+
+  'it should construct cases': (test) ->
+    cases = @viff.constructCases(@config.browsers, @config.compare, @links)
+    cases.length.should.equal 4
+    _.first(cases).browser.should.equal 'safari'
     test.done()
 
 

@@ -2,7 +2,7 @@ mr = require 'Mr.Async'
 _ = require 'underscore'
 Canvas = require 'canvas'
 util = require 'util'
-EventEmitter = require('events').EventEmitter
+{EventEmitter} = require 'events'
 
 webdriver = require 'selenium-webdriver'
 Comparison = require './comparison'
@@ -20,10 +20,7 @@ class Viff extends EventEmitter
   takeScreenshot: (browserName, envHost, url, callback) -> 
 
     that = @
-    defer = mr.Deferred()
-    
-    defer.done (base64Img, duration) => @emit 'tookScreenshot', browserName, envHost, url, duration, base64Img
-    defer.done(callback)
+    defer = mr.Deferred().done(callback)
     
     unless driver = @drivers[browserName]
       @builder = @builder.withCapabilities { browserName: browserName }
@@ -33,18 +30,16 @@ class Viff extends EventEmitter
     envName = _.first(envName for envName of envHost)
     [parsedUrl, selector, preHandle] = Viff.parseUrl url
 
-
     driver.get envHost[envName] + parsedUrl
     preHandle driver, webdriver if _.isFunction preHandle
 
     driver.call( ->
-      startDate = Date.now()
       driver.takeScreenshot().then (base64Img) -> 
         if _.isString selector
           Viff.dealWithPartial base64Img, driver, selector, (partialBase64Img) ->
-            defer.resolve partialBase64Img, Date.now() - startDate
+            defer.resolve new Buffer(partialBase64Img, 'base64'), null
         else 
-          defer.resolve base64Img, Date.now() - startDate
+          defer.resolve new Buffer(base64Img, 'base64'), null
 
       return
     ).addErrback (ex) ->
@@ -53,41 +48,60 @@ class Viff extends EventEmitter
 
     defer.promise()
 
-  takeScreenshots: (browsers, envHosts, links, callback) ->
-    defer = mr.Deferred()
-    defer.done callback
-
-    compares = {}
-    returned = 0
-    total = browsers.length * links.length
-    that = this
-
+  constructCases: (browsers, envHosts, links) ->
+    cases = []
     _.each browsers, (browser) ->
-      compares[browser] = compares[browser] || {}
-      
       _.each links, (url) ->
-        path = Viff.getPathKey url
-        envCompares = {}
+        [[from, envFromPath], [to, envToPath]] = _.pairs envHosts
 
-        _.each envHosts, (host, env) ->
-          envHost = {}
-          envHost[env] = host
-          
-          that.takeScreenshot browser, envHost, url, (base64Img) ->
-            envHost[env] = base64Img
-            _.extend(envCompares, envHost)
+        cases.push 
+          browser: browser
+          url: url
+          fromname: from
+          toname: to
+          from: _.object [[from, envFromPath]]
+          to: _.object [[to, envToPath]]
 
-            if _.isEqual _.keys(envCompares), _.keys(envHosts)
-              unless _.contains _.values(envCompares), ''
-                compares[browser][path] = new Comparison(envCompares) 
-              returned++
+    cases
 
-            if _.isEqual links.length, _.keys(compares[browser]).length
-              that.drivers[browser].quit()
+  takeScreenshots: (browsers, envHosts, links, callback) ->
+    defer = mr.Deferred().done callback
+    cases = @constructCases browsers, envHosts, links
+    that = this
+    compares = {}
 
-            if returned == total
-              defer.resolve compares
-          
+    @emit 'before', cases
+    start = Date.now()
+    mr.asynEach(cases, (_case) ->
+      iterator = this
+
+      path = Viff.getPathKey _case.url
+      startcase = Date.now()
+      compares[_case.browser] = compares[_case.browser] || {}
+
+      that.takeScreenshot _case.browser, _case.from, _case.url, (fromImage, fromImgEx) ->
+        that.takeScreenshot _case.browser, _case.to, _case.url, (toImage, toImgEx) ->
+
+          if fromImgEx isnt null or toImgEx isnt null
+            compares[_case.browser][path] = _case.result = null
+            that.emit 'afterEach', _case, 0
+            iterator.next()
+          else 
+            imgWithEnvs = _.object [[_case.fromname, fromImage], [_case.toname, toImage]]
+            comparison = new Comparison imgWithEnvs
+            
+            comparison.diff (diffImg) ->
+              compares[_case.browser][path] = _case.result = comparison
+              that.drivers[_case.browser].quit() if links.length == _.keys(compares[_case.browser]).length
+              that.emit 'afterEach', _case, Date.now() - startcase
+
+            iterator.next()
+    , -> 
+      endTime = Date.now() - start
+      that.emit 'after', cases, endTime
+      defer.resolve cases, endTime
+    ).start()
+
     defer.promise()
 
   @getPathKey: (url) ->
@@ -99,8 +113,7 @@ class Viff extends EventEmitter
     path
 
   @dealWithPartial: (base64Img, driver, selector, callback) ->
-    defer = mr.Deferred()
-    defer.done callback
+    defer = mr.Deferred().done callback
 
     driver.findElement(webdriver.By.css(selector)).then (elem) ->
       elem.getLocation().then (location) ->
@@ -114,26 +127,6 @@ class Viff extends EventEmitter
           defer.resolve cvs.toBuffer().toString('base64')
 
     defer.promise()
-
-  @diff: (compares, callback) ->
-    defer = mr.Deferred()
-    defer.done callback
-
-    comparisons = Viff.comparisons(compares)
-    returned = 0
-    _.each comparisons, (comparison) ->
-      comparison.diff (diffImgBase64) ->
-        defer.resolve(compares) if returned++ == comparisons.length - 1
-
-    defer.promise()
-
-  @comparisons: (compares) ->
-    ret = []
-    _.each compares, (urls, browserName) -> 
-      _.each urls, (comparison, url) ->
-        ret.push comparison
-
-    ret
 
   @parseUrl = (urlInfo) ->
     if Object.prototype.toString.call(urlInfo) is '[object Object]'

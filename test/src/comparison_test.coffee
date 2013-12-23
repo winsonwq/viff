@@ -15,8 +15,7 @@ module.exports =
       isSameDimensions: true
       misMatchPercentage: "2.84"
       analysisTime: 54
-      getImageDataUrl: () ->
-        'ABCD'
+      getImageDataUrl: () -> 'ABCD'
 
     @comparison = new Comparison @imgWithEnvs
 
@@ -41,7 +40,7 @@ module.exports =
     @comparison.diff callback
 
     test.ok callback.calledOnce
-    test.equals @comparison.images.diff, 'ABCD'
+    test.equals @comparison.images.diff.toString('base64'), 'ABCD'
     test.done()
 
   'it should get correct diff property': (test) ->
