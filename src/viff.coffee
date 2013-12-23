@@ -36,8 +36,8 @@ class Viff extends EventEmitter
     driver.call( ->
       driver.takeScreenshot().then (base64Img) -> 
         if _.isString selector
-          Viff.dealWithPartial base64Img, driver, selector, (partialBase64Img) ->
-            defer.resolve new Buffer(partialBase64Img, 'base64'), null
+          Viff.dealWithPartial base64Img, driver, selector, (partialImgBuffer) ->
+            defer.resolve partialImgBuffer, null
         else 
           defer.resolve new Buffer(base64Img, 'base64'), null
 
@@ -124,7 +124,7 @@ class Viff extends EventEmitter
           img.src = new Buffer base64Img, 'base64'
           ctx.drawImage img, location.x, location.y, size.width, size.height, 0, 0, size.width, size.height
 
-          defer.resolve cvs.toBuffer().toString('base64')
+          defer.resolve cvs.toBuffer()
 
     defer.promise()
 
