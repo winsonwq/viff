@@ -115,6 +115,16 @@ module.exports =
 
     @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
 
+  'it should take fire many times `beforeEach` handler': (test) ->
+    beforeEachHandler = sinon.spy()
+    @viff.on 'beforeEach', beforeEachHandler
+
+    callback = (compares) -> 
+      test.equals beforeEachHandler.callCount, 4
+      test.done()
+    
+    @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
+
   'it should take fire many times `afterEach` handler': (test) ->
     afterEachHandler = sinon.spy()
     @viff.on 'afterEach', afterEachHandler

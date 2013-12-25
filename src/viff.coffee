@@ -74,8 +74,9 @@ class Viff extends EventEmitter
 
     mr.asynEach(cases, (_case) ->
       iterator = this
-
       startcase = Date.now()
+
+      that.emit 'beforeEach', _case, 0
       that.takeScreenshot _case.from.browser, _case.from.host, _case.url, (fromImage, fromImgEx) ->
         that.takeScreenshot _case.to.browser, _case.to.host, _case.url, (toImage, toImgEx) ->
 
