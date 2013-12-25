@@ -47,27 +47,36 @@ class Viff extends EventEmitter
 
     defer.promise()
 
-  constructCases: (browsers, envHosts, links) ->
+  @constructCase: (browser, browserFrom, browserTo, hostFrom, hostTo, nameFrom, nameTo, url) ->
+    browser: browser
+    url: url
+    from:
+      browser: browserFrom
+      name: nameFrom
+      host: hostFrom
+    to: 
+      browser: browserTo
+      name: nameTo
+      host: hostTo
+
+  @constructCases: (browsers, envHosts, links) ->
     cases = []
-    _.each browsers, (browser) ->
-      _.each links, (url) ->
-        [[from, envFromHost], [to, envToHost]] = _.pairs envHosts
+    _.each links, (url) ->
+      _.each browsers, (browser) ->
 
-        cases.push 
-          browser: browser
-          url: url
-          from: 
-            name: from
-            host: envFromHost
-          to: 
-            name: to
-            host: envToHost
+        if _.contains(browser, ':')
+          [browserFrom, browserTo] = browser.split ':'
 
+          _.each envHosts, (host, envName) ->
+            cases.push Viff.constructCase browser, browserFrom, browserTo, host, host, envName, envName, url
+        else
+          [[from, envFromHost], [to, envToHost]] = _.pairs envHosts
+          cases.push Viff.constructCase browser, browser, browser, envFromHost, envToHost, from, to, url
     cases
 
   takeScreenshots: (browsers, envHosts, links, callback) ->
     defer = mr.Deferred().done callback
-    cases = @constructCases browsers, envHosts, links
+    cases = Viff.constructCases browsers, envHosts, links
     that = this
 
     @emit 'before', cases
@@ -78,8 +87,8 @@ class Viff extends EventEmitter
       path = Viff.getPathKey _case.url
       startcase = Date.now()
 
-      that.takeScreenshot _case.browser, _case.from.host, _case.url, (fromImage, fromImgEx) ->
-        that.takeScreenshot _case.browser, _case.to.host, _case.url, (toImage, toImgEx) ->
+      that.takeScreenshot _case.from.browser, _case.from.host, _case.url, (fromImage, fromImgEx) ->
+        that.takeScreenshot _case.to.browser, _case.to.host, _case.url, (toImage, toImgEx) ->
 
           if fromImgEx isnt null or toImgEx isnt null
             that.emit 'afterEach', _case, 0

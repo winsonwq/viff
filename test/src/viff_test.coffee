@@ -107,13 +107,6 @@ module.exports =
     @viff.takeScreenshots @config.browsers, @config.compare, links, callback
 
   'it should take many screenshots according to config': (test) ->
-    format = 
-      safari:
-        '/404.html': {}
-        '/strict-mode': {}
-      firefox:
-        '/404.html': {}
-        '/strict-mode': {}
 
     callback = (cases) ->
       test.equals cases.length, 4
@@ -239,10 +232,17 @@ module.exports =
     test.done()
 
   'it should construct cases': (test) ->
-    cases = @viff.constructCases(@config.browsers, @config.compare, @links)
+    cases = Viff.constructCases(@config.browsers, @config.compare, @links)
     cases.length.should.equal 4
-    _.first(cases).browser.should.equal 'safari'
+    _.first(cases).from.browser.should.equal 'safari'
     test.done()
+
+  'it should construct cases when set comparing cross browsers': (test) ->
+    browsers = ['chrome:firefox', 'firefox'];
+    cases = Viff.constructCases(browsers, @config.compare, @links)
+    cases.length.should.equal 6
+    _.first(cases).from.name.should.equal 'build'
+    test.done()  
 
 
 
