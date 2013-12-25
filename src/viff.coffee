@@ -69,7 +69,6 @@ class Viff extends EventEmitter
     defer = mr.Deferred().done callback
     cases = @constructCases browsers, envHosts, links
     that = this
-    compares = {}
 
     @emit 'before', cases
     start = Date.now()
@@ -78,13 +77,11 @@ class Viff extends EventEmitter
 
       path = Viff.getPathKey _case.url
       startcase = Date.now()
-      compares[_case.browser] = compares[_case.browser] || {}
 
       that.takeScreenshot _case.browser, _case.from.host, _case.url, (fromImage, fromImgEx) ->
         that.takeScreenshot _case.browser, _case.to.host, _case.url, (toImage, toImgEx) ->
 
           if fromImgEx isnt null or toImgEx isnt null
-            compares[_case.browser][path] = _case.result = null
             that.emit 'afterEach', _case, 0
             iterator.next()
           else 
@@ -92,14 +89,15 @@ class Viff extends EventEmitter
             comparison = new Comparison imgWithEnvs
             
             comparison.diff (diffImg) ->
-              compares[_case.browser][path] = _case.result = comparison
-              that.drivers[_case.browser].quit() if links.length == _.keys(compares[_case.browser]).length
+              _case.result = comparison
               that.emit 'afterEach', _case, Date.now() - startcase
 
-            iterator.next()
+              iterator.next()
     , -> 
       endTime = Date.now() - start
+      that.drivers[browser].quit() for browser in browsers
       that.emit 'after', cases, endTime
+
       defer.resolve cases, endTime
     ).start()
 
