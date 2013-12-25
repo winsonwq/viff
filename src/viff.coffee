@@ -6,7 +6,7 @@ util = require 'util'
 
 webdriver = require 'selenium-webdriver'
 Comparison = require './comparison'
-Case = require './case'
+Testcase = require './testcase'
 
 webdriver.promise.controlFlow().on 'uncaughtException', (e) -> 
   console.error 'Unhandled error: ' + e
@@ -28,7 +28,7 @@ class Viff extends EventEmitter
       driver = @builder.build()
       @drivers[browserName] = driver
 
-    [parsedUrl, selector, preHandle] = Viff.parseUrl url
+    [parsedUrl, selector, preHandle] = Testcase.parseUrl url
 
     driver.get host + parsedUrl
     preHandle driver, webdriver if _.isFunction preHandle
@@ -57,10 +57,10 @@ class Viff extends EventEmitter
           [browserFrom, browserTo] = browser.split '-'
 
           _.each envHosts, (host, envName) ->
-            cases.push new Case browser, browserFrom, browserTo, host, host, envName, envName, url
+            cases.push new Testcase(browser, browserFrom, browserTo, host, host, envName, envName, url)
         else
           [[from, envFromHost], [to, envToHost]] = _.pairs envHosts
-          cases.push new Case browser, browser, browser, envFromHost, envToHost, from, to, url
+          cases.push new Testcase(browser, browser, browser, envFromHost, envToHost, from, to, url)
 
     cases
 
@@ -71,6 +71,7 @@ class Viff extends EventEmitter
 
     @emit 'before', cases
     start = Date.now()
+
     mr.asynEach(cases, (_case) ->
       iterator = this
 
@@ -103,21 +104,6 @@ class Viff extends EventEmitter
   closeDrivers: () ->
     @drivers[browser].quit() for browser of @drivers
 
-  @getPathKey: (url) ->
-    [path, selector, preHandle, description] = Viff.parseUrl url
-    if _.isString description
-      path = description
-    else if _.isString selector
-      path = "#{path} (#{selector})" if _.isString selector
-    path
-
-  @getCaseKey: (_case) ->
-    path = Viff.getPathKey _case.url
-    if _case.from.name is _case.to.name
-      path = _case.from.name + ':' + path
-
-    path
-
   @dealWithPartial: (base64Img, driver, selector, callback) ->
     defer = mr.Deferred().done callback
 
@@ -133,19 +119,5 @@ class Viff extends EventEmitter
           defer.resolve cvs.toBuffer()
 
     defer.promise()
-
-  @parseUrl = (urlInfo) ->
-    if Object.prototype.toString.call(urlInfo) is '[object Object]'
-      description = _.first _.keys urlInfo
-      urlInfo = urlInfo[description]
-
-    if _.isArray urlInfo
-      url = _.first urlInfo 
-      preHandle = _.last urlInfo if _.isFunction _.last(urlInfo)
-      selector = urlInfo[1] if _.isString urlInfo[1]
-    else if _.isString urlInfo
-      url = urlInfo
-
-    [url, selector, preHandle, description]
 
 module.exports = Viff

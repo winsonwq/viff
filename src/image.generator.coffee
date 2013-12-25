@@ -7,8 +7,7 @@ wrench = require 'wrench'
 
 Viff = require './viff'
 
-preprocessFolderName = (_case) ->
-  encodeURIComponent Viff.getCaseKey _case
+preprocessFolderName = (_case) -> encodeURIComponent _case.key()
 
 currentRunningDirname = process.cwd()
 screenshotPath = path.join currentRunningDirname, './screenshots'
@@ -63,9 +62,8 @@ _.extend ImageGenerator,
 
     _.each cases, (_case) ->
       if _case.result
-        path = Viff.getCaseKey _case
         compares[_case.browser] = compares[_case.browser] || {}
-        compares[_case.browser][path] = _case.result
+        compares[_case.browser][_case.key()] = _case.result
 
         differences.push _case if _case.result.misMatchPercentage isnt 0
         totalAnalysisTime += _case.result.analysisTime

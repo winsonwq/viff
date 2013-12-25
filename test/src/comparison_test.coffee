@@ -1,4 +1,4 @@
-Comparison = require '../../lib/comparison.js'
+Comparison = require '../../lib/comparison'
 sinon = require 'sinon'
 _ = require 'underscore'
 fs = require 'fs'

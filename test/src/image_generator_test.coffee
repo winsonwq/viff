@@ -5,6 +5,7 @@ fs = require 'fs'
 wrench = require 'wrench'
 
 ImageGenerator = require '../../lib/image.generator.js'
+Case = require '../../lib/testcase'
 
 module.exports = 
   setUp: (callback) ->
@@ -30,25 +31,15 @@ module.exports =
     callback()
 
   'it could generate images by case': (test) ->
-    c = 
-      browser: 'firefox'
-      url: '/link1'
-      from:
-        browser: 'firefox'
-        name: 'build' 
-        host: 'http://localhost:4000'
-      to: 
-        browser: 'firefox'
-        name: 'prod'
-        host: 'http://localhost:4001'
-      result:
-        images:
-          build: 'ABCD'
-          prod: 'EFGH'
-          diff: 'IJKL'
-        isSameDimensions: true
-        misMatchPercentage: 0.2
-        analysisTime: 2000
+    c = new Case('firefox', 'firefox', 'firefox', 'http://localhost:4000', 'http://localhost:4001', 'build', 'prod', '/link1')
+    c.result = 
+      images:
+        build: 'ABCD'
+        prod: 'EFGH'
+        diff: 'IJKL'
+      isSameDimensions: true
+      misMatchPercentage: 0.2
+      analysisTime: 2000
     
     @existsSync = @existsSync.returns false
 
@@ -61,25 +52,15 @@ module.exports =
     test.done()
 
   'it could generate images by case when comparing cross browsers': (test) ->
-    c = 
-      browser: 'firefox:safari'
-      url: '/link1'
-      from:
-        browser: 'firefox'
-        name: 'build' 
-        host: 'http://localhost:4000'
-      to: 
-        browser: 'safari'
-        name: 'build'
-        host: 'http://localhost:4000'
-      result:
-        images:
-          'firefox-build': 'ABCD'
-          'safari-build': 'EFGH'
-          diff: 'IJKL'
-        isSameDimensions: true
-        misMatchPercentage: 0.2
-        analysisTime: 2000
+    c = new Case('firefox:safari', 'firefox', 'safari', 'http://localhost:4000', 'http://localhost:4000', 'build', 'build', '/link1')
+    c.result = 
+      images:
+        'firefox-build': 'ABCD'
+        'safari-build': 'EFGH'
+        diff: 'IJKL'
+      isSameDimensions: true
+      misMatchPercentage: 0.2
+      analysisTime: 2000
     
     @existsSync = @existsSync.returns false
 
