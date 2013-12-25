@@ -71,15 +71,13 @@ viff ./build_prod.config.js --selenium-host http://localhost:4000/wd/hub
 ```
 Actually, these arguments like `--selenium-host` are optional. But if set, the inline configurations will override configurations in `.config.js` file. So `http://localhost:4000/wd/hub` will be in use.
 
-## html report example
-![html report example](http://ww2.sinaimg.cn/mw1024/64eae748tw1e6leimsy64j20rm0go0u6.jpg)
-
 ## file report embeded in viff reporter
 ![file report example](http://ww2.sinaimg.cn/mw1024/64eae748jw1e7fmlo9otwj21kw0vrqe5.jpg)
 
 repo for viff reporter is [ViffReport](https://github.com/xjsi/ViffReport)
 
 # History
+2013-12-25 **viff@0.7.0** refactor testcases and compare differences cross browsers !!! Merry Christmas !!!
 
 2013-11-13 **viff@0.6.1** optimise memory usage and only support `file` report format
 
