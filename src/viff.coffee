@@ -51,15 +51,17 @@ class Viff extends EventEmitter
     cases = []
     _.each browsers, (browser) ->
       _.each links, (url) ->
-        [[from, envFromPath], [to, envToPath]] = _.pairs envHosts
+        [[from, envFromHost], [to, envToHost]] = _.pairs envHosts
 
         cases.push 
           browser: browser
           url: url
-          fromname: from
-          toname: to
-          from: _.object [[from, envFromPath]]
-          to: _.object [[to, envToPath]]
+          from: 
+            name: from
+            host: envFromHost
+          to: 
+            name: to
+            host: envToHost
 
     cases
 
@@ -78,15 +80,15 @@ class Viff extends EventEmitter
       startcase = Date.now()
       compares[_case.browser] = compares[_case.browser] || {}
 
-      that.takeScreenshot _case.browser, _case.from[_case.fromname], _case.url, (fromImage, fromImgEx) ->
-        that.takeScreenshot _case.browser, _case.to[_case.toname], _case.url, (toImage, toImgEx) ->
+      that.takeScreenshot _case.browser, _case.from.host, _case.url, (fromImage, fromImgEx) ->
+        that.takeScreenshot _case.browser, _case.to.host, _case.url, (toImage, toImgEx) ->
 
           if fromImgEx isnt null or toImgEx isnt null
             compares[_case.browser][path] = _case.result = null
             that.emit 'afterEach', _case, 0
             iterator.next()
           else 
-            imgWithEnvs = _.object [[_case.fromname, fromImage], [_case.toname, toImage]]
+            imgWithEnvs = _.object [[_case.from.name, fromImage], [_case.to.name, toImage]]
             comparison = new Comparison imgWithEnvs
             
             comparison.diff (diffImg) ->
