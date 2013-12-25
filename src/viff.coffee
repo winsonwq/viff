@@ -103,13 +103,16 @@ class Viff extends EventEmitter
               iterator.next()
     , -> 
       endTime = Date.now() - start
-      # that.drivers[browser].quit() for browser in browsers
+      that.closeDrivers()
       that.emit 'after', cases, endTime
 
       defer.resolve cases, endTime
     ).start()
 
     defer.promise()
+
+  closeDrivers: () ->
+    @drivers[browser].quit() for browser of @drivers
 
   @getPathKey: (url) ->
     [path, selector, preHandle, description] = Viff.parseUrl url
