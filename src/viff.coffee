@@ -17,7 +17,7 @@ class Viff extends EventEmitter
     @builder = new webdriver.Builder().usingServer(seleniumHost)
     @drivers = {}
 
-  takeScreenshot: (browserName, envHost, url, callback) -> 
+  takeScreenshot: (browserName, host, url, callback) -> 
 
     that = @
     defer = mr.Deferred().done(callback)
@@ -27,10 +27,9 @@ class Viff extends EventEmitter
       driver = @builder.build()
       @drivers[browserName] = driver
 
-    envName = _.first(envName for envName of envHost)
     [parsedUrl, selector, preHandle] = Viff.parseUrl url
 
-    driver.get envHost[envName] + parsedUrl
+    driver.get host + parsedUrl
     preHandle driver, webdriver if _.isFunction preHandle
 
     driver.call( ->
@@ -79,8 +78,8 @@ class Viff extends EventEmitter
       startcase = Date.now()
       compares[_case.browser] = compares[_case.browser] || {}
 
-      that.takeScreenshot _case.browser, _case.from, _case.url, (fromImage, fromImgEx) ->
-        that.takeScreenshot _case.browser, _case.to, _case.url, (toImage, toImgEx) ->
+      that.takeScreenshot _case.browser, _case.from[_case.fromname], _case.url, (fromImage, fromImgEx) ->
+        that.takeScreenshot _case.browser, _case.to[_case.toname], _case.url, (toImage, toImgEx) ->
 
           if fromImgEx isnt null or toImgEx isnt null
             compares[_case.browser][path] = _case.result = null

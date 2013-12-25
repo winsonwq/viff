@@ -58,37 +58,30 @@ module.exports =
   'it should use correct browser to take screenshot': (test) ->
     useCapability = sinon.spy @viff.builder, 'withCapabilities'
       
-    @viff.takeScreenshot('firefox', { build: 'http://localhost:4000' }, @links.first)
+    @viff.takeScreenshot('firefox', 'http://localhost:4000', @links.first)
     test.ok useCapability.calledWith { browserName: 'firefox' }
     test.done()
 
   'it should visit the correct url to take screenshot': (test) ->
-    envHost = 
-      build: 'http://localhost:4000'
+    host = 'http://localhost:4000'
+    @viff.takeScreenshot('firefox', host, @links.first)
 
-    @viff.takeScreenshot('firefox', envHost, @links.first)
-
-    test.ok @getUrl.calledWith envHost.build + @links.first
+    test.ok @getUrl.calledWith host + @links.first
     test.done()
 
   'it should invoke callback with the base64 string for screenshot': (test) ->
-    envHost = 
-      build: 'http://localhost:4000'
-    
     callback = sinon.spy()
-    @viff.takeScreenshot('firefox', envHost, @links.first, callback)
+    @viff.takeScreenshot('firefox', 'http://localhost:4000', @links.first, callback)
 
     test.equals callback.firstCall.args[0].toString('base64'), 'base64string'
     test.done()
 
   'it should invoke pre handler before take screenshot': (test) ->
-    envHost = 
-      build: 'http://localhost:4000'
 
     preHandler = sinon.spy()
 
     link = ['/path', preHandler]
-    @viff.takeScreenshot('firefox', envHost, link)
+    @viff.takeScreenshot('firefox', 'http://localhost:4000', link)
 
     test.ok preHandler.calledWith @driver, webdriver
     test.done()
@@ -160,28 +153,24 @@ module.exports =
     @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
 
   'it should take partial screenshot according to selecor': (test) ->
-    envHost = 
-      build: 'http://localhost:4000'
 
     preHandler = sinon.spy()
     link = ['/path', 'selector', preHandler]
     partialTake = sinon.stub(Viff, 'dealWithPartial').returns { then: -> }
 
-    @viff.takeScreenshot('firefox', envHost, link)
+    @viff.takeScreenshot('firefox', 'http://localhost:4000', link)
     partialTake.restore()
 
     test.ok partialTake.calledWith 'base64string', @driver, 'selector'
     test.done()
 
   'it should run pre-handler when using selector': (test) ->
-    envHost = 
-      build: 'http://localhost:4000'
 
     preHandler = sinon.spy()
     link = ['/path', 'selector', preHandler]
     partialTake = sinon.stub(Viff, 'dealWithPartial').returns { then: -> }
 
-    @viff.takeScreenshot('firefox', envHost, link)
+    @viff.takeScreenshot('firefox', 'http://localhost:4000', link)
     partialTake.restore()
 
     test.ok preHandler.calledWith @driver, webdriver
@@ -254,6 +243,7 @@ module.exports =
     cases.length.should.equal 4
     _.first(cases).browser.should.equal 'safari'
     test.done()
+
 
 
     
