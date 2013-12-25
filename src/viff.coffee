@@ -42,7 +42,7 @@ class Viff extends EventEmitter
 
       return
     ).addErrback (ex) ->
-      console.error "ERROR: For path #{url} with selector #{selector||''}, #{ex.message.split('\n')[0]}"
+      console.error "ERROR: For path #{util.inspect(url)} with selector #{selector||''}, #{ex.message.split('\n')[0]}"
       defer.resolve ''
 
     defer.promise()
@@ -64,14 +64,15 @@ class Viff extends EventEmitter
     _.each links, (url) ->
       _.each browsers, (browser) ->
 
-        if _.contains(browser, ':')
-          [browserFrom, browserTo] = browser.split ':'
+        if _.contains(browser, '-')
+          [browserFrom, browserTo] = browser.split '-'
 
           _.each envHosts, (host, envName) ->
             cases.push Viff.constructCase browser, browserFrom, browserTo, host, host, envName, envName, url
         else
           [[from, envFromHost], [to, envToHost]] = _.pairs envHosts
           cases.push Viff.constructCase browser, browser, browser, envFromHost, envToHost, from, to, url
+
     cases
 
   takeScreenshots: (browsers, envHosts, links, callback) ->
@@ -84,9 +85,7 @@ class Viff extends EventEmitter
     mr.asynEach(cases, (_case) ->
       iterator = this
 
-      path = Viff.getPathKey _case.url
       startcase = Date.now()
-
       that.takeScreenshot _case.from.browser, _case.from.host, _case.url, (fromImage, fromImgEx) ->
         that.takeScreenshot _case.to.browser, _case.to.host, _case.url, (toImage, toImgEx) ->
 
@@ -94,7 +93,7 @@ class Viff extends EventEmitter
             that.emit 'afterEach', _case, 0
             iterator.next()
           else 
-            imgWithEnvs = _.object [[_case.from.name, fromImage], [_case.to.name, toImage]]
+            imgWithEnvs = _.object [[_case.from.browser + '-' + _case.from.name, fromImage], [_case.to.browser + '-' + _case.to.name, toImage]]
             comparison = new Comparison imgWithEnvs
             
             comparison.diff (diffImg) ->
@@ -104,7 +103,7 @@ class Viff extends EventEmitter
               iterator.next()
     , -> 
       endTime = Date.now() - start
-      that.drivers[browser].quit() for browser in browsers
+      # that.drivers[browser].quit() for browser in browsers
       that.emit 'after', cases, endTime
 
       defer.resolve cases, endTime
@@ -118,6 +117,13 @@ class Viff extends EventEmitter
       path = description
     else if _.isString selector
       path = "#{path} (#{selector})" if _.isString selector
+    path
+
+  @getCaseKey: (_case) ->
+    path = Viff.getPathKey _case.url
+    if _case.from.name is _case.to.name
+      path = _case.from.name + ':' + path
+
     path
 
   @dealWithPartial: (base64Img, driver, selector, callback) ->

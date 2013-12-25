@@ -7,8 +7,8 @@ wrench = require 'wrench'
 
 Viff = require './viff'
 
-preprocessFolderName = (name) ->
-  encodeURIComponent Viff.getPathKey name
+preprocessFolderName = (_case) ->
+  encodeURIComponent Viff.getCaseKey _case
 
 currentRunningDirname = process.cwd()
 screenshotPath = path.join currentRunningDirname, './screenshots'
@@ -46,11 +46,11 @@ _.extend ImageGenerator,
 
   generateByCase: (_case) ->
     browserFolderPath = path.join screenshotPath, _case.browser
-    urlFolderPath = path.join browserFolderPath, preprocessFolderName(_case.url)
+    urlFolderPath = path.join browserFolderPath, preprocessFolderName(_case)
 
     ImageGenerator.createFolder browserFolderPath
     ImageGenerator.createFolder urlFolderPath
-
+    
     _.each _case.result.images, (img, env) ->
       imagePath = path.join(urlFolderPath, env + '.png')
       ImageGenerator.createImageFile imagePath, img
@@ -63,7 +63,7 @@ _.extend ImageGenerator,
 
     _.each cases, (_case) ->
       if _case.result
-        path = Viff.getPathKey _case.url
+        path = Viff.getCaseKey _case
         compares[_case.browser] = compares[_case.browser] || {}
         compares[_case.browser][path] = _case.result
 
