@@ -18,10 +18,12 @@ module.exports = function(grunt) {
           'lib/process.argv.js': 'src/process.argv.coffee',
           'lib/image.generator.js': 'src/image.generator.coffee',
           'lib/console.status.js': 'src/console.status.coffee',
+          'lib/case.js': 'src/case.coffee',
           'test/build/comparison_test.js': 'test/src/comparison_test.coffee',
           'test/build/viff_test.js': 'test/src/viff_test.coffee',
           'test/build/process_argv_test.js': 'test/src/process_argv_test.coffee',
-          'test/build/image_generator_test.js': 'test/src/image_generator_test.coffee'
+          'test/build/image_generator_test.js': 'test/src/image_generator_test.coffee',
+          'test/build/case_test.js': 'test/src/case_test.coffee'
         }
       }
     },

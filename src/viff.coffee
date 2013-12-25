@@ -6,6 +6,7 @@ util = require 'util'
 
 webdriver = require 'selenium-webdriver'
 Comparison = require './comparison'
+Case = require './case'
 
 webdriver.promise.controlFlow().on 'uncaughtException', (e) -> 
   console.error 'Unhandled error: ' + e
@@ -47,18 +48,6 @@ class Viff extends EventEmitter
 
     defer.promise()
 
-  @constructCase: (browser, browserFrom, browserTo, hostFrom, hostTo, nameFrom, nameTo, url) ->
-    browser: browser
-    url: url
-    from:
-      browser: browserFrom
-      name: nameFrom
-      host: hostFrom
-    to: 
-      browser: browserTo
-      name: nameTo
-      host: hostTo
-
   @constructCases: (browsers, envHosts, links) ->
     cases = []
     _.each links, (url) ->
@@ -68,10 +57,10 @@ class Viff extends EventEmitter
           [browserFrom, browserTo] = browser.split '-'
 
           _.each envHosts, (host, envName) ->
-            cases.push Viff.constructCase browser, browserFrom, browserTo, host, host, envName, envName, url
+            cases.push new Case browser, browserFrom, browserTo, host, host, envName, envName, url
         else
           [[from, envFromHost], [to, envToHost]] = _.pairs envHosts
-          cases.push Viff.constructCase browser, browser, browser, envFromHost, envToHost, from, to, url
+          cases.push new Case browser, browser, browser, envFromHost, envToHost, from, to, url
 
     cases
 
