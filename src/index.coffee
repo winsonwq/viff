@@ -23,5 +23,6 @@ if config.reportFormat == 'file'
     
   # generate report.json  
   viff.on 'after', (cases, duration) -> imgGen.generateReport cases
-  
-viff.takeScreenshots(config.browsers, config.envHosts, config.paths);
+
+cases = Viff.constructCases config.browsers, config.envHosts, config.paths
+viff.run cases

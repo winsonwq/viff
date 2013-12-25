@@ -91,7 +91,7 @@ module.exports =
     callback = (cases) -> 
       test.equals _.first(cases).url[0], '/404.html'
       test.done()
-    @viff.takeScreenshots @config.browsers, @config.compare, links, callback
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, links), callback
 
   'it should use correct path string when set selector': (test) ->
     links = [['/404.html', '#page', (driver, webdriver) -> ]]
@@ -104,7 +104,7 @@ module.exports =
       test.equals _.first(cases).url[1], '#page'
       test.done()
 
-    @viff.takeScreenshots @config.browsers, @config.compare, links, callback
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, links), callback
 
   'it should take many screenshots according to config': (test) ->
 
@@ -113,7 +113,7 @@ module.exports =
       test.equals _.first(cases).url, '/404.html'
       test.done()
 
-    @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, @links), callback
 
   'it should take fire many times `beforeEach` handler': (test) ->
     beforeEachHandler = sinon.spy()
@@ -123,7 +123,7 @@ module.exports =
       test.equals beforeEachHandler.callCount, 4
       test.done()
     
-    @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, @links), callback
 
   'it should take fire many times `afterEach` handler': (test) ->
     afterEachHandler = sinon.spy()
@@ -133,7 +133,7 @@ module.exports =
       test.equals afterEachHandler.callCount, 4
       test.done()
     
-    @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, @links), callback
 
   'it should take fire only once `before` handler': (test) ->
     beforeHandler = sinon.spy()
@@ -143,7 +143,7 @@ module.exports =
       test.equals beforeHandler.callCount, 1
       test.done()
     
-    @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, @links), callback
 
   'it should take fire only once `after` handler': (test) ->
     beforeHandler = sinon.spy()
@@ -153,7 +153,7 @@ module.exports =
       test.equals beforeHandler.callCount, 1
       test.done()
     
-    @viff.takeScreenshots @config.browsers, @config.compare, @links, callback
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, @links), callback
 
   'it should take partial screenshot according to selecor': (test) ->
 
@@ -185,21 +185,21 @@ module.exports =
       test.equals c.browser, 'safari'
       test.equals c.url, '/404.html'
 
-    @viff.takeScreenshots @config.browsers, @config.compare, links, -> test.done()
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, links), -> test.done()
 
   'it should fire testcase `before` hook': (test) ->
     links = ['/404.html']
     @viff.once 'before', (cases) -> 
       test.equals cases.length, 2
 
-    @viff.takeScreenshots @config.browsers, @config.compare, links, -> test.done()
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, links), -> test.done()
 
   'it should fire testcase `after` hook': (test) ->
     links = ['/404.html']
     @viff.once 'after', (cases) -> 
       test.equals cases.length, 2
 
-    @viff.takeScreenshots @config.browsers, @config.compare, links, -> test.done()
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, links), -> test.done()
 
   'it should construct cases': (test) ->
     cases = Viff.constructCases(@config.browsers, @config.compare, @links)

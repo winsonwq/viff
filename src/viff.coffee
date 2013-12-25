@@ -64,9 +64,8 @@ class Viff extends EventEmitter
 
     cases
 
-  takeScreenshots: (browsers, envHosts, links, callback) ->
+  run: (cases, callback) ->
     defer = mr.Deferred().done callback
-    cases = Viff.constructCases browsers, envHosts, links
     that = this
 
     @emit 'before', cases
