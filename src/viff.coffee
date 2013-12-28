@@ -21,11 +21,11 @@ class Viff extends EventEmitter
   takeScreenshot: (capability, host, url, callback) -> 
     that = @
     defer = mr.Deferred().done(callback)
-    
-    unless driver = @drivers[capability]
-      @builder = @builder.withCapabilities { browserName: capability }
+
+    unless driver = @drivers[capability.browserName]
+      @builder = @builder.withCapabilities { browserName: capability.browserName }
       driver = @builder.build()
-      @drivers[capability] = driver
+      @drivers[capability.browserName] = driver
 
     [parsedUrl, selector, preHandle] = Testcase.parseUrl url
 
@@ -82,7 +82,7 @@ class Viff extends EventEmitter
             that.emit 'afterEach', _case, 0
             iterator.next()
           else 
-            imgWithEnvs = _.object [[_case.from.capability + '-' + _case.from.name, fromImage], [_case.to.capability + '-' + _case.to.name, toImage]]
+            imgWithEnvs = _.object [[_case.from.capability.browserName + '-' + _case.from.name, fromImage], [_case.to.capability.browserName + '-' + _case.to.name, toImage]]
             comparison = new Comparison imgWithEnvs
             
             comparison.diff (diffImg) ->

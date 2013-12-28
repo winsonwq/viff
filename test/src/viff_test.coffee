@@ -6,6 +6,7 @@ require('chai').should()
 
 Viff = require '../../lib/viff.js'
 webdriver = require 'selenium-webdriver'
+Capability = require '../../lib/capability'
 
 module.exports = 
   setUp: (callback) ->
@@ -58,7 +59,7 @@ module.exports =
   'it should use correct browser to take screenshot': (test) ->
     useCapability = sinon.spy @viff.builder, 'withCapabilities'
       
-    @viff.takeScreenshot('firefox', 'http://localhost:4000', @links.first)
+    @viff.takeScreenshot(new Capability('firefox'), 'http://localhost:4000', @links.first)
     test.ok useCapability.calledWith { browserName: 'firefox' }
     test.done()
 
@@ -204,7 +205,7 @@ module.exports =
   'it should construct cases': (test) ->
     cases = Viff.constructCases(@config.browsers, @config.compare, @links)
     cases.length.should.equal 4
-    _.first(cases).from.capability.should.equal 'safari'
+    _.first(cases).from.capability.browserName.should.equal 'safari'
     test.done()
 
   'it should construct cases when set comparing cross browsers': (test) ->

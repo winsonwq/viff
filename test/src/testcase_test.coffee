@@ -13,10 +13,10 @@ module.exports =
 
   'it should have correct structure': (test) ->
     test.equal @c.browser, 'firefox-safari'
-    test.equal @c.from.capability, 'firefox'
+    test.equal @c.from.capability.browserName, 'firefox'
     test.equal @c.from.name, 'name'
     test.equal @c.from.host, 'http://from'
-    test.equal @c.to.capability, 'safari'
+    test.equal @c.to.capability.browserName, 'safari'
     test.equal @c.to.name, 'name'
     test.equal @c.to.host, 'http://to'
     test.equal @c.url, '/url'

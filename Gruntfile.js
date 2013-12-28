@@ -19,11 +19,13 @@ module.exports = function(grunt) {
           'lib/image.generator.js': 'src/image.generator.coffee',
           'lib/console.status.js': 'src/console.status.coffee',
           'lib/testcase.js': 'src/testcase.coffee',
+          'lib/capability.js': 'src/capability.coffee',
           'test/build/comparison_test.js': 'test/src/comparison_test.coffee',
           'test/build/viff_test.js': 'test/src/viff_test.coffee',
           'test/build/process_argv_test.js': 'test/src/process_argv_test.coffee',
           'test/build/image_generator_test.js': 'test/src/image_generator_test.coffee',
-          'test/build/testcase_test.js': 'test/src/testcase_test.coffee'
+          'test/build/testcase_test.js': 'test/src/testcase_test.coffee',
+          'test/build/capability_test.js': 'test/src/capability_test.coffee'
         }
       }
     },

@@ -1,11 +1,15 @@
 _ = require 'underscore'
+Capability = require './capability'
 
 class Testcase
 
   constructor: (capablityFrom, capabilityTo, hostFrom, hostTo, nameFrom, nameTo, @url) ->
 
-    @browser = capablityFrom
-    @browser = (capablityFrom + '-' + capabilityTo) unless _.isEqual capablityFrom, capabilityTo
+    capablityFrom = new Capability capablityFrom
+    capabilityTo = new Capability capabilityTo
+
+    @browser = capablityFrom.browserName
+    @browser = (capablityFrom.browserName + '-' + capabilityTo.browserName) unless _.isEqual capablityFrom.browserName, capabilityTo.browserName
 
     @from = 
       capability: capablityFrom
