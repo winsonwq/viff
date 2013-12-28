@@ -5,7 +5,7 @@ Testcase = require '../../lib/testcase'
 
 module.exports = 
   setUp: (callback) ->
-    @c = new Testcase('firefox-safari', 'firefox', 'safari', 'http://from', 'http://to', 'name', 'name', '/url')
+    @c = new Testcase('firefox', 'safari', 'http://from', 'http://to', 'name', 'name', '/url')
     callback()
 
   tearDown: (callback) ->

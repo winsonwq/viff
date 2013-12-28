@@ -19,7 +19,6 @@ class Viff extends EventEmitter
     @drivers = {}
 
   takeScreenshot: (browserName, host, url, callback) -> 
-
     that = @
     defer = mr.Deferred().done(callback)
     
@@ -53,14 +52,14 @@ class Viff extends EventEmitter
     _.each links, (url) ->
       _.each browsers, (browser) ->
 
-        if _.contains(browser, '-')
-          [browserFrom, browserTo] = browser.split '-'
+        if _.isArray browser
+          [browserFrom, browserTo] = browser
 
           _.each envHosts, (host, envName) ->
-            cases.push new Testcase(browser, browserFrom, browserTo, host, host, envName, envName, url)
+            cases.push new Testcase(browserFrom, browserTo, host, host, envName, envName, url)
         else
           [[from, envFromHost], [to, envToHost]] = _.pairs envHosts
-          cases.push new Testcase(browser, browser, browser, envFromHost, envToHost, from, to, url)
+          cases.push new Testcase(browser, browser, envFromHost, envToHost, from, to, url)
 
     cases
 
