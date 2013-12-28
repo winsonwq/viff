@@ -2,17 +2,17 @@ _ = require 'underscore'
 
 class Testcase
 
-  constructor: (browserFrom, browserTo, hostFrom, hostTo, nameFrom, nameTo, @url) ->
+  constructor: (capablityFrom, capabilityTo, hostFrom, hostTo, nameFrom, nameTo, @url) ->
 
-    @browser = browserFrom
-    @browser = (browserFrom + '-' + browserTo) unless _.isEqual browserFrom, browserTo
+    @browser = capablityFrom
+    @browser = (capablityFrom + '-' + capabilityTo) unless _.isEqual capablityFrom, capabilityTo
 
     @from = 
-      browser: browserFrom
+      capability: capablityFrom
       name: nameFrom
       host: hostFrom
     @to = 
-      browser: browserTo
+      capability: capabilityTo
       name: nameTo
       host: hostTo
 

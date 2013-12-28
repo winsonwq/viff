@@ -204,7 +204,7 @@ module.exports =
   'it should construct cases': (test) ->
     cases = Viff.constructCases(@config.browsers, @config.compare, @links)
     cases.length.should.equal 4
-    _.first(cases).from.browser.should.equal 'safari'
+    _.first(cases).from.capability.should.equal 'safari'
     test.done()
 
   'it should construct cases when set comparing cross browsers': (test) ->

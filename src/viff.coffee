@@ -18,14 +18,14 @@ class Viff extends EventEmitter
     @builder = new webdriver.Builder().usingServer(seleniumHost)
     @drivers = {}
 
-  takeScreenshot: (browserName, host, url, callback) -> 
+  takeScreenshot: (capability, host, url, callback) -> 
     that = @
     defer = mr.Deferred().done(callback)
     
-    unless driver = @drivers[browserName]
-      @builder = @builder.withCapabilities { browserName: browserName }
+    unless driver = @drivers[capability]
+      @builder = @builder.withCapabilities { browserName: capability }
       driver = @builder.build()
-      @drivers[browserName] = driver
+      @drivers[capability] = driver
 
     [parsedUrl, selector, preHandle] = Testcase.parseUrl url
 
@@ -47,19 +47,19 @@ class Viff extends EventEmitter
 
     defer.promise()
 
-  @constructCases: (browsers, envHosts, links) ->
+  @constructCases: (capabilities, envHosts, links) ->
     cases = []
     _.each links, (url) ->
-      _.each browsers, (browser) ->
+      _.each capabilities, (capability) ->
 
-        if _.isArray browser
-          [browserFrom, browserTo] = browser
+        if _.isArray capability
+          [capabilityFrom, capabilityTo] = capability
 
           _.each envHosts, (host, envName) ->
-            cases.push new Testcase(browserFrom, browserTo, host, host, envName, envName, url)
+            cases.push new Testcase(capabilityFrom, capabilityTo, host, host, envName, envName, url)
         else
           [[from, envFromHost], [to, envToHost]] = _.pairs envHosts
-          cases.push new Testcase(browser, browser, envFromHost, envToHost, from, to, url)
+          cases.push new Testcase(capability, capability, envFromHost, envToHost, from, to, url)
 
     cases
 
@@ -75,14 +75,14 @@ class Viff extends EventEmitter
       startcase = Date.now()
 
       that.emit 'beforeEach', _case, 0
-      that.takeScreenshot _case.from.browser, _case.from.host, _case.url, (fromImage, fromImgEx) ->
-        that.takeScreenshot _case.to.browser, _case.to.host, _case.url, (toImage, toImgEx) ->
+      that.takeScreenshot _case.from.capability, _case.from.host, _case.url, (fromImage, fromImgEx) ->
+        that.takeScreenshot _case.to.capability, _case.to.host, _case.url, (toImage, toImgEx) ->
 
           if fromImgEx isnt null or toImgEx isnt null
             that.emit 'afterEach', _case, 0
             iterator.next()
           else 
-            imgWithEnvs = _.object [[_case.from.browser + '-' + _case.from.name, fromImage], [_case.to.browser + '-' + _case.to.name, toImage]]
+            imgWithEnvs = _.object [[_case.from.capability + '-' + _case.from.name, fromImage], [_case.to.capability + '-' + _case.to.name, toImage]]
             comparison = new Comparison imgWithEnvs
             
             comparison.diff (diffImg) ->
