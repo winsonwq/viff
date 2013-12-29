@@ -22,10 +22,10 @@ class Viff extends EventEmitter
     that = @
     defer = mr.Deferred().done(callback)
 
-    unless driver = @drivers[capability.browserName]
-      @builder = @builder.withCapabilities { browserName: capability.browserName }
+    unless driver = @drivers[capability.key()]
+      @builder = @builder.withCapabilities capability
       driver = @builder.build()
-      @drivers[capability.browserName] = driver
+      @drivers[capability.key()] = driver
 
     [parsedUrl, selector, preHandle] = Testcase.parseUrl url
 
@@ -82,7 +82,7 @@ class Viff extends EventEmitter
             that.emit 'afterEach', _case, 0
             iterator.next()
           else 
-            imgWithEnvs = _.object [[_case.from.capability.browserName + '-' + _case.from.name, fromImage], [_case.to.capability.browserName + '-' + _case.to.name, toImage]]
+            imgWithEnvs = _.object [[_case.from.capability.key() + '-' + _case.from.name, fromImage], [_case.to.capability.key() + '-' + _case.to.name, toImage]]
             comparison = new Comparison imgWithEnvs
             
             comparison.diff (diffImg) ->

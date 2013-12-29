@@ -60,19 +60,19 @@ module.exports =
     useCapability = sinon.spy @viff.builder, 'withCapabilities'
       
     @viff.takeScreenshot(new Capability('firefox'), 'http://localhost:4000', @links.first)
-    test.ok useCapability.calledWith { browserName: 'firefox' }
+    test.equals useCapability.firstCall.args[0].browserName, 'firefox'
     test.done()
 
   'it should visit the correct url to take screenshot': (test) ->
     host = 'http://localhost:4000'
-    @viff.takeScreenshot('firefox', host, @links.first)
+    @viff.takeScreenshot(new Capability('firefox'), host, @links.first)
 
     test.ok @getUrl.calledWith host + @links.first
     test.done()
 
   'it should invoke callback with the base64 string for screenshot': (test) ->
     callback = sinon.spy()
-    @viff.takeScreenshot('firefox', 'http://localhost:4000', @links.first, callback)
+    @viff.takeScreenshot(new Capability('firefox'), 'http://localhost:4000', @links.first, callback)
 
     test.equals callback.firstCall.args[0].toString('base64'), 'base64string'
     test.done()
@@ -82,7 +82,7 @@ module.exports =
     preHandler = sinon.spy()
 
     link = ['/path', preHandler]
-    @viff.takeScreenshot('firefox', 'http://localhost:4000', link)
+    @viff.takeScreenshot(new Capability('firefox'), 'http://localhost:4000', link)
 
     test.ok preHandler.calledWith @driver, webdriver
     test.done()
@@ -162,7 +162,7 @@ module.exports =
     link = ['/path', 'selector', preHandler]
     partialTake = sinon.stub(Viff, 'dealWithPartial').returns { then: -> }
 
-    @viff.takeScreenshot('firefox', 'http://localhost:4000', link)
+    @viff.takeScreenshot(new Capability('firefox'), 'http://localhost:4000', link)
     partialTake.restore()
 
     test.ok partialTake.calledWith 'base64string', @driver, 'selector'
@@ -174,7 +174,7 @@ module.exports =
     link = ['/path', 'selector', preHandler]
     partialTake = sinon.stub(Viff, 'dealWithPartial').returns { then: -> }
 
-    @viff.takeScreenshot('firefox', 'http://localhost:4000', link)
+    @viff.takeScreenshot(new Capability('firefox'), 'http://localhost:4000', link)
     partialTake.restore()
 
     test.ok preHandler.calledWith @driver, webdriver
