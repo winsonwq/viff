@@ -37,7 +37,7 @@ class Viff extends EventEmitter
         if _.isString selector
           Viff.dealWithPartial base64Img, driver, selector, (partialImgBuffer) ->
             defer.resolve partialImgBuffer, null
-        else 
+        else
           defer.resolve new Buffer(base64Img, 'base64'), null
 
       return

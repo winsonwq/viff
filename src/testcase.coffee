@@ -8,8 +8,8 @@ class Testcase
     capablityFrom = new Capability capablityFrom
     capabilityTo = new Capability capabilityTo
 
-    @browser = capablityFrom.browserName
-    @browser = (capablityFrom.browserName + '-' + capabilityTo.browserName) unless _.isEqual capablityFrom.browserName, capabilityTo.browserName
+    @browser = capablityFrom.key()
+    @browser = (capablityFrom.key() + '-' + capabilityTo.key()) unless _.isEqual capablityFrom.key(), capabilityTo.key()
 
     @from = 
       capability: capablityFrom
