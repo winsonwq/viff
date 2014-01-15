@@ -32,7 +32,7 @@ mergeAndValidateConfig = (seleniumHost, browsers, envHosts, paths, reportFormat,
   c.reportFormat = 'html' if c.reportFormat is undefined
   
   throw new Error('--selenium-host isn\'t set correctly') if c.seleniumHost is undefined
-  throw new Error('-envs aren\'t set correctly.') if c.envHosts is undefined or _.keys(c.envHosts).length < 2
+  throw new Error('-envs aren\'t set correctly.') if c.envHosts is undefined or _.keys(c.envHosts).length < 1
   throw new Error('-paths aren\'t set correctly.') if c.paths is undefined or c.paths.length is 0
 
   c
