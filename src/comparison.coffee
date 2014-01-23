@@ -15,7 +15,6 @@ class Comparison
     fileData = _.values(@images)
 
     Comparison.compare fileData[0], fileData[1], (diffObj) -> 
-      
       if diffObj
         diffBase64 = diffObj.getImageDataUrl().replace('data:image/png;base64,', '')
         that.images.diff = new Buffer diffBase64, 'base64'
@@ -30,8 +29,7 @@ class Comparison
     defer.promise()
 
   @compare: (fileAData, fileBData, callback) ->
-    defer = mr.Deferred()
-    defer.done callback
+    defer = mr.Deferred().done callback
 
     resemble(fileAData).compareTo(fileBData).onComplete (data) ->
       defer.resolve data

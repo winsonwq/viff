@@ -90,6 +90,7 @@ viff ./build_prod.config.js
 repo for viff reporter is [ViffReport](https://github.com/xjsi/ViffReport)
 
 # History
+2013-12-25 **viff@0.7.0** refactor testcases and compare differences cross browsers !!! Merry Christmas !!!
 
 2013-11-13 **viff@0.6.1** optimise memory usage and only support `file` report format
 

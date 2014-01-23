@@ -19,11 +19,11 @@ module.exports = (viff) ->
       currentBrowserName = _case.browser
       console.log "#{currentBrowserName.info}"
 
-    caseName = Viff.getPathKey _case.url
+    caseName = _case.key()
     caseDuration += duration
 
     if currentCaseName isnt caseName
-      console.log "#{Viff.getPathKey _case.url} (#{durationFormat(duration)})"
+      console.log "#{_case.key()} (#{durationFormat(duration)})"
       currentCaseName = caseName
       caseDuration = 0
 
