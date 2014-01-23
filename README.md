@@ -30,24 +30,6 @@ $ wdm start // open selenium webdriver server
 You could run `xx.config.js` file.
 
 ```javascript
-// links.js
-'use strict'
-
-module.exports = [
-  '/404.html',
-  '/',
-  '/page2',
-  '/page3',
-  '/page4',
-  '/page5',
-  '/strict-mode',
-  ['/', function clickLink(browser, webdriver) {
-    browser.findElement(webdriver.By.partialLinkText('viff')).click();
-  }],
-  ['/', '#main-content'/*, function (browser, webdriver) { } */],
-  { 'this is a testcase description' : ['/' /*, '#main-content', function(browser, webdriver) {} */]}
-];
-
 // build_prod.config.js
 'use strict'
 
