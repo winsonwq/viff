@@ -66,12 +66,49 @@ Then, you could run
 viff ./build_prod.config.js
 ```
 
+## Programmable
+
+Use `viff` in your own project.
+
+```
+var Viff = require('viff');
+var viff = new Viff('http://localhost:4444/wd/hub');
+
+viff.takeScreenshot('firefox', 'http://localhost:3000', '/path1', function (bufferImg) {
+  /* buffer of images */  
+});
+
+// partial of web pages
+viff.takeScreenshot('firefox', 'http://localhost:3000', ['path1', '#css-selecor'], function (bufferPartialImg) {});
+
+// responsive of web pages
+function size(width) {
+  return function (driver, webdriver) {
+    driver.manage().window().setSize(width, 600 /* any height*/);
+  };
+}
+
+viff.takeScreenshot('firefox', 'http://localhost:3000', ['path', size(1024)], function (bufferImg) {});
+
+// using browserstack
+viff = new Viff('http://hub.browserstack.com/wd/hub');
+viff.takeScreenshot({
+  'browserName' : 'iPhone',
+  'platform' : 'MAC',
+  'device' : 'iPhone 5',
+  'browserstack.user': /* your name */,
+  'browserstack.key': /* your key */
+}, 'http://www.google.com', 'path1', function (bufferImg) {});
+```
+
 ## file report embeded in viff reporter
 ![file report example](http://ww2.sinaimg.cn/mw1024/64eae748jw1e7fmlo9otwj21kw0vrqe5.jpg)
 
 repo for viff reporter is [ViffReport](https://github.com/xjsi/ViffReport)
 
 # History
+2013-12-25 **viff@0.7.2** make viff programmable.
+
 2013-12-25 **viff@0.7.0** refactor testcases and compare differences cross browsers !!! Merry Christmas !!!
 
 2013-11-13 **viff@0.6.1** optimise memory usage and only support `file` report format

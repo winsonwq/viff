@@ -7,6 +7,7 @@ util = require 'util'
 webdriver = require 'selenium-webdriver'
 Comparison = require './comparison'
 Testcase = require './testcase'
+Capability = require './capability'
 
 webdriver.promise.controlFlow().on 'uncaughtException', (e) -> 
   console.error 'Unhandled error: ' + e
@@ -21,6 +22,8 @@ class Viff extends EventEmitter
   takeScreenshot: (capability, host, url, callback) -> 
     that = @
     defer = mr.Deferred().done(callback)
+
+    capability = new Capability capability
 
     unless driver = @drivers[capability.key()]
       @builder = @builder.withCapabilities capability

@@ -27,7 +27,7 @@ module.exports = (grunt) ->
           'test/build/process_argv_test.js': 'test/src/process_argv_test.coffee',
           'test/build/image_generator_test.js': 'test/src/image_generator_test.coffee',
           'test/build/testcase_test.js': 'test/src/testcase_test.coffee',
-          'test/build/capability_test.js': 'test/src/capability_test.coffee'
+          'test/build/capability.spec.js': 'test/src/capability.spec.coffee'
 
     watch:
       coffee:
