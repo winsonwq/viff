@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 
   // Project configuration.
   grunt.initConfig({
-    source: ['src/**/*.coffee', 'test/**/*.coffee'],
+    source: ['src/**/*.coffee', 'test/**/*.coffee', 'Gruntfile.js'],
     nodeunit: {
       all: ['test/**/*_test.js']
     },
@@ -36,15 +36,24 @@ module.exports = function(grunt) {
       },
       nodeunit: {
         files: '<%= source %>',
-        tasks: ['coffee', 'nodeunit']
+        tasks: ['default']
       }
     },
+    mochaTest: {
+      test: {
+        options: {
+          reporter: 'spec'
+        },
+        src: ['test/**/*.js']
+      }
+    }
   });
 
   // These plugins provide necessary tasks.
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
+  grunt.loadNpmTasks('grunt-mocha-test');
 
   // Default task.
   grunt.registerTask('default', ['coffee', 'nodeunit']);
