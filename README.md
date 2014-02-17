@@ -70,7 +70,7 @@ viff ./build_prod.config.js
 
 Use `viff` in your own project.
 
-```
+```javascript
 var Viff = require('viff');
 var viff = new Viff('http://localhost:4444/wd/hub');
 
