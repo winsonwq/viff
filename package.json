@@ -28,7 +28,7 @@
     "Mr.Async": "~0.3.1",
     "underscore": "*",
     "selenium-webdriver": ">=2.33.0",
-    "handlebars": "~1.0.12", 
+    "handlebars": "~1.0.12",
     "resemble": "~1.0.3",
     "wrench": "*",
     "colors": "*",
@@ -41,9 +41,16 @@
     "grunt-contrib-coffee": "~0.7.0",
     "grunt-contrib-nodeunit": "~0.2.0",
     "sinon": "*",
-    "chai": "*"
+    "chai": "*",
+    "grunt-mocha-test": "~0.9.0"
   },
-  "keywords": ["testing", "viff", "diff", "web", "e2e"],
+  "keywords": [
+    "testing",
+    "viff",
+    "diff",
+    "web",
+    "e2e"
+  ],
   "bin": {
     "viff": "./bin/viff"
   },
