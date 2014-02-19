@@ -1,6 +1,8 @@
 _ = require 'underscore'
 path = require 'path'
 
+isPureObject = (obj) -> Object.prototype.toString.call(obj) is '[object Object]'
+
 parseBrowsers = (value) ->
   browsers = []
   for browser in value.split ','
@@ -44,13 +46,15 @@ filterByGrep = (paths, grep) ->
   ps.forEach (p, idx) ->
     target = p if _.isString p
     target = _.first(p) if _.isArray p
-    target = _.first(_.keys(p)) if Object.prototype.toString.call(p) is '[object Object]'
+    target = _.first(_.keys(p)) if isPureObject p
     
     ret.push(p) if reg.test target
 
   ret
 
 checkIfNeedHelp = (args) ->
+  return false if isPureObject args
+
   argsCollection = ['-browsers', '-envs', '-paths', '--report-format', '--selenium-host']
   needHelp = true
   for param in args
@@ -98,28 +102,31 @@ processArgv = (args) ->
   if checkIfNeedHelp(args)
     return help()
 
-  while arg = args.shift()
-    switch arg
-      when '-browsers'
-        browsers = parseBrowsers args.shift()
+  if isPureObject args
+    config = args
+  else 
+    while arg = args.shift()
+      switch arg
+        when '-browsers'
+          browsers = parseBrowsers args.shift()
 
-      when '-envs'
-        envHosts = parseEnvHosts args.shift()
-      when '-paths'
-        paths = parsePaths args.shift()
+        when '-envs'
+          envHosts = parseEnvHosts args.shift()
+        when '-paths'
+          paths = parsePaths args.shift()
 
-      when '--report-format'
-        reportFormat = args.shift().trim()
+        when '--report-format'
+          reportFormat = args.shift().trim()
 
-      when '--selenium-host'
-        seleniumHost = args.shift().trim()
+        when '--selenium-host'
+          seleniumHost = args.shift().trim()
 
-      when '-grep'
-        grep = args.shift().trim()
+        when '-grep'
+          grep = args.shift().trim()
 
-      else
-        if arg.indexOf('.config.js') > 0
-          config = require path.resolve process.cwd(), arg
+        else
+          if arg.indexOf('.config.js') > 0
+            config = require path.resolve process.cwd(), arg
 
   c = mergeAndValidateConfig seleniumHost, browsers, envHosts, paths, reportFormat, grep, config
   c.paths = filterByGrep(c.paths, grep) if grep
