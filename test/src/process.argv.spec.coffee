@@ -199,6 +199,12 @@ describe 'process argv', ->
     (typeof(config)).should.eql 'string'
     (config.indexOf('Usage:') >= 0).should.be.true
 
+  it 'should accept config object input as default config info', ->
+    argv = require '../src/correct.config'
+    config = processArgv argv
+    config.paths.length.should.equal 3
+
+
 
 
 
