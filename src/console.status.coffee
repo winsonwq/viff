@@ -12,8 +12,6 @@ module.exports = (viff) ->
   viff.on 'before', (cases) -> console.log 'Viff is taking screenshots...\n'
 
   viff.on 'afterEach', (_case, duration, fex, tex) ->
-    caseInfo = ""
-
     if fex or tex
       exceptions.push { fex: fex, tex: tex, key: _case.key() }
       console.log "  #{(exceptions.length + ')').error} #{_case.browser.error} #{_case.key().error} "
@@ -34,3 +32,4 @@ module.exports = (viff) ->
         console.error message
 
       console.error ''
+      process.exit 1
