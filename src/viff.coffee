@@ -45,8 +45,7 @@ class Viff extends EventEmitter
 
       return
     ).addErrback (ex) ->
-      console.error "ERROR: For path #{util.inspect(url)} with selector #{selector||''}, #{ex.message.split('\n')[0]}"
-      defer.resolve ''
+      defer.resolve '', ex
 
     defer.promise()
 
@@ -82,7 +81,7 @@ class Viff extends EventEmitter
         that.takeScreenshot _case.to.capability, _case.to.host, _case.url, (toImage, toImgEx) ->
 
           if fromImgEx isnt null or toImgEx isnt null
-            that.emit 'afterEach', _case, 0
+            that.emit 'afterEach', _case, 0, fromImgEx, toImgEx
             iterator.next()
           else 
             imgWithEnvs = _.object [[_case.from.capability.key() + '-' + _case.from.name, fromImage], [_case.to.capability.key() + '-' + _case.to.name, toImage]]

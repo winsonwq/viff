@@ -4,3 +4,4 @@ colors.setTheme
   info: 'green'
   prompt: 'magenta'
   greyColor: 'grey'
+  error: 'red'
