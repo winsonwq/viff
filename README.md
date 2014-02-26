@@ -107,6 +107,8 @@ viff.takeScreenshot({
 repo for viff reporter is [ViffReport](https://github.com/xjsi/ViffReport)
 
 # History
+2014-02-26 **viff@0.7.4** simplify console output [DEMO](https://asciinema.org/a/7903).
+
 2014-02-17 **viff@0.7.2** make viff programmable.
 
 2013-12-25 **viff@0.7.0** refactor testcases and compare differences cross browsers !!! Merry Christmas !!!
