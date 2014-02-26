@@ -57,7 +57,6 @@
   },
   "scripts": {
     "build": "coffee -o ./lib/ -c src/*.coffee",
-    "preinstall": "cd ./scripts && ./pre-install.sh",
     "install": "npm run build",
     "test": "npm install && grunt default"
   }
