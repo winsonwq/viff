@@ -25,7 +25,7 @@ module.exports = (grunt) ->
           'lib/testcase.js': 'src/testcase.coffee',
           'lib/capability.js': 'src/capability.coffee',
           'test/build/comparison_test.js': 'test/src/comparison_test.coffee',
-          'test/build/viff_test.js': 'test/src/viff_test.coffee',
+          'test/build/viff.spec.js': 'test/src/viff.spec.coffee',
           'test/build/process.argv.spec.js': 'test/src/process.argv.spec.coffee',
           'test/build/image_generator_test.js': 'test/src/image_generator_test.coffee',
           'test/build/testcase_test.js': 'test/src/testcase_test.coffee',

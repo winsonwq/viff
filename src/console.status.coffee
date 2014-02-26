@@ -6,32 +6,30 @@ durationFormat = (duration) -> (duration / 1000).toFixed(2) + 's'
 
 module.exports = (viff) ->
 
-  currentBrowserName = null
-  currentUrl = null
-  currentCaseName = null
-  caseDuration = 0
+  exceptions = []
 
   # clean the images and report.json
-  viff.on 'before', (cases) -> console.log 'Viff is taking screenshots...'
+  viff.on 'before', (cases) -> console.log 'Viff is taking screenshots...\n'
 
-  viff.on 'afterEach', (_case, duration) ->
-    if currentBrowserName isnt _case.browser
-      currentBrowserName = _case.browser
-      console.log "#{currentBrowserName.info}"
-
-    caseName = _case.key()
-    caseDuration += duration
-
-    if currentCaseName isnt caseName
-      console.log "#{_case.key()} (#{durationFormat(duration)})"
-      currentCaseName = caseName
-      caseDuration = 0
+  viff.on 'afterEach', (_case, duration, fex, tex) ->
+    if fex or tex
+      exceptions.push { fex: fex, tex: tex, key: _case.key() }
+      console.log "  #{(exceptions.length + ')').error} #{_case.browser.error} #{_case.key().error} "
+    else 
+      drationStr = "(#{durationFormat(duration)})".greyColor
+      console.log "  - #{_case.browser.info} #{_case.key().greyColor} #{drationStr}"
 
   # generate report.json  
-  viff.on 'after', (cases, duration) -> console.log "\nDone in #{durationFormat(duration)}."
+  viff.on 'after', (cases, duration) -> 
+    console.log "\nDone in #{durationFormat(duration)}, #{(exceptions.length + ' failed.').greyColor}\n"
 
-  imgGen.on imgGen.CREATE_FOLDER, (folerPath) ->
-    console.log "#{ 'viff'.greyColor } #{ 'create'.info } #{ 'folder'.prompt } #{folerPath}"
+    if total = exceptions.length
+      while ex = exceptions.shift()
+        fexMsg = ex.fex.message + '\n\n' if ex.fex?.message?
+        texMsg = ex.tex.message + '\n\n' if ex.tex?.message? 
+        title = (total - exceptions.length) + ') ' + ex.key + '\n'
+        message = "    #{title}#{fexMsg.error}#{texMsg.error}".replace(/\n/g, '\n       ')
+        console.error message
 
-  imgGen.on imgGen.CREATE_FILE, (filePath) ->
-    console.log "#{ 'viff'.greyColor } #{ 'create'.info } #{ ' file '.prompt } #{filePath}"
+      console.error ''
+      process.exit 1
