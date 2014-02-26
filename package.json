@@ -1,7 +1,7 @@
 {
   "name": "viff",
   "description": "Find virtual differences between web pages in different environments(developing, staging, production) and browsers.",
-  "version": "0.7.4",
+  "version": "0.7.5",
   "homepage": "https://github.com/winsonwq/viff",
   "author": {
     "name": "Wang Qiu",
@@ -57,7 +57,6 @@
   },
   "scripts": {
     "build": "coffee -o ./lib/ -c src/*.coffee",
-    "preinstall": "cd ./scripts && ./pre-install.sh",
     "install": "npm run build",
     "test": "npm install && grunt default"
   }
