@@ -2,7 +2,7 @@
 
 Find virsual differences between web pages in different environments(developing, staging, production) and browsers.
 
-# Installation
+## Installation
 
 Viff is running on selenium sever. Don't worry, you can easily set up selenium server by using `wdm`.
 
@@ -19,7 +19,22 @@ No need to install coffee-script if you have.
 
 If you meet issue about `node-canvas`. Have a check [node-canvas wiki](https://github.com/LearnBoost/node-canvas/wiki/Installation---OSX)
 
-# Example
+## Examples
+
+Checkout [`viff-examples`](https://github.com/winsonwq/viff-examples) reporsitory for more examples including
+
+1. Tiny CSS difference
+2. Chart difference
+3. Content difference
+4. Partial difference
+5. Event Handling
+6. Responsive
+7. Multiple browsers
+8. Multiple Environments
+9. Browserstack
+10. Programmable
+
+### Quick example
 
 Start server
 
