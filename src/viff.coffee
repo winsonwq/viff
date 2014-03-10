@@ -4,19 +4,17 @@ util = require 'util'
 {EventEmitter} = require 'events'
 
 Q = require 'q'
+wd = require 'wd'
 webdriver = require 'selenium-webdriver'
 Comparison = require './comparison'
 Testcase = require './testcase'
 Capability = require './capability'
 
-webdriver.promise.controlFlow().on 'uncaughtException', (e) -> 
-  console.error 'Unhandled error: ' + e
-
 class Viff extends EventEmitter
   constructor: (seleniumHost) ->
     EventEmitter.call @
 
-    @builder = new webdriver.Builder().usingServer(seleniumHost)
+    @builder = wd.promiseChainRemote seleniumHost
     @drivers = {}
 
   takeScreenshot: (capability, host, url, callback) -> 
@@ -27,26 +25,22 @@ class Viff extends EventEmitter
     capability = new Capability capability
 
     unless driver = @drivers[capability.key()]
-      @builder = @builder.withCapabilities capability
-      driver = @builder.build()
-      @drivers[capability.key()] = driver
+      @drivers[capability.key()] = driver = @builder.init capability
 
     [parsedUrl, selector, preHandle] = Testcase.parseUrl url
 
     driver.get host + parsedUrl
-    preHandle driver, webdriver if _.isFunction preHandle
+    preHandle driver if _.isFunction preHandle
 
-    driver.call( ->
-      driver.takeScreenshot().then (base64Img) -> 
-        if _.isString selector
-          Viff.dealWithPartial base64Img, driver, selector, (partialImgBuffer) ->
-            defer.resolve [partialImgBuffer, null]
-        else
-          defer.resolve [new Buffer(base64Img, 'base64'), null]
+    driver.takeScreenshot (err, base64Img) -> 
+      return defer.resolve ['', ex] if err
 
-      return
-    ).addErrback (ex) ->
-      defer.resolve ['', ex]
+      if _.isString selector
+        Viff.dealWithPartial base64Img, driver, selector, (err, partialImgBuffer) ->
+          defer.resolve ['', err] if err
+          defer.resolve [partialImgBuffer, null]
+      else
+        defer.resolve [new Buffer(base64Img, 'base64'), null]
 
     defer.promise
 
@@ -115,17 +109,19 @@ class Viff extends EventEmitter
     defer = Q.defer()
     defer.promise.done callback
 
-    driver.findElement(webdriver.By.css(selector)).then (elem) ->
-      elem.getLocation().then (location) ->
-        elem.getSize().then (size) ->
+    driver.elementByCss selector, (err, elem) ->
+      defer.resolve err, null if err
+
+      elem && elem.getLocation (err, location) ->
+        elem.getSize (err, size) ->
           cvs = new Canvas(size.width, size.height)
           ctx = cvs.getContext '2d'
           img = new Canvas.Image
           img.src = new Buffer base64Img, 'base64'
           ctx.drawImage img, location.x, location.y, size.width, size.height, 0, 0, size.width, size.height
 
-          defer.resolve cvs.toBuffer()
-
+          defer.resolve [null, cvs.toBuffer()]
+          
     defer.promise
 
 module.exports = Viff

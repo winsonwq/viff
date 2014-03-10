@@ -1,5 +1,4 @@
 _ = require 'underscore'
-require 'webdriver-helper'
 
 Viff = require './viff.js'
 processArgs = require './process.argv.js'

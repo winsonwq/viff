@@ -21,18 +21,15 @@ describe 'viff', ->
 
     @viff = new Viff(@config.seleniumHost)
     
-    @thenObj = then: ->
     @driver = 
-      call: (fn) -> 
-        fn()
-        { addErrback: -> }
-      get: (url) -> 
-      takeScreenshot: => @thenObj
+      get: (url) ->
+      takeScreenshot: => 
       quit: ->
-    
+
     @getUrl = sinon.spy @driver, 'get'
-    sinon.stub(@viff.builder, 'build').returns(@driver)
-    sinon.stub(@thenObj, 'then').yieldsAsync 'base64string'
+
+    @init = sinon.stub(@viff.builder, 'init').returns(@driver)
+    sinon.stub(@driver, 'takeScreenshot').callsArgWithAsync 0, null, 'base64string'
 
     @links = ['/404.html', '/strict-mode']
 
@@ -48,23 +45,19 @@ describe 'viff', ->
 
     callback()
   afterEach (callback) ->
-    for method in [@viff.builder.build, @thenObj.then, Comparison.compare]
+    for method in [@viff.builder.init, @driver.takeScreenshot, Comparison.compare]
       method.restore() 
 
     callback()
 
-  it 'should create correct builder', () ->
-    @viff.builder.getServerUrl().should.eql @config.seleniumHost
+  it 'should use correct browser to take screenshot', (done) ->
+    @viff.takeScreenshot('firefox', 'http://localhost:4000', @links.first).done =>
+      @init.firstCall.args[0].browserName.should.eql 'firefox'
+      done()
 
-  it 'should use correct browser to take screenshot', () ->
-    useCapability = sinon.spy @viff.builder, 'withCapabilities'
-      
-    @viff.takeScreenshot(new Capability('firefox'), 'http://localhost:4000', @links.first)
-    useCapability.firstCall.args[0].browserName.should.eql 'firefox'
-
-  it 'should visit the correct url to take screenshot', () ->
+  it 'should visit the correct url to take screenshot', (done) ->
     host = 'http://localhost:4000'
-    @viff.takeScreenshot(new Capability('firefox'), host, @links.first)
+    @viff.takeScreenshot('firefox', host, @links.first).done -> done()
 
     @getUrl.calledWith(host + @links.first).should.be.true
 
@@ -73,16 +66,15 @@ describe 'viff', ->
       base64img.toString('base64').should.eql 'base64string'
       done()
 
-    @viff.takeScreenshot(new Capability('firefox'), 'http://localhost:4000', @links.first, callback)
+    @viff.takeScreenshot('firefox', 'http://localhost:4000', @links.first, callback)
 
-  it 'should invoke pre handler before take screenshot', () ->
-
+  it 'should invoke pre handler before take screenshot', (done) ->
     preHandler = sinon.spy()
 
     link = ['/path', preHandler]
-    @viff.takeScreenshot(new Capability('firefox'), 'http://localhost:4000', link)
-
-    preHandler.calledWith(@driver, webdriver).should.be.true
+    @viff.takeScreenshot('firefox', 'http://localhost:4000', link).done => 
+      preHandler.calledWith(@driver).should.be.true
+      done()
 
   it 'should use correct path when set pre handler', (done) ->
     links = [['/404.html', (driver, webdriver) -> ]]
@@ -163,15 +155,16 @@ describe 'viff', ->
       partialTake.restore()
       done();
 
-  it 'should run pre-handler when using selector', () ->
+  it 'should run pre-handler when using selector', (done) ->
 
     preHandler = sinon.spy()
     link = ['/path', 'selector', preHandler]
     partialTake = sinon.stub(Viff, 'dealWithPartial').callsArgWithAsync 3, new Buffer('partialBase64Img')
 
-    @viff.takeScreenshot new Capability('firefox'), 'http://localhost:4000', link, =>
-      preHandler.calledWith(@driver, webdriver).should.be.true
+    @viff.takeScreenshot('firefox', 'http://localhost:4000', link).done =>
+      preHandler.calledWith(@driver).should.be.true
       partialTake.restore()
+      done()
 
 
   it 'should fire testcase `afterEach` hook', (done) ->
