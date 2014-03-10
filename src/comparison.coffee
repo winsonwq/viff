@@ -1,6 +1,5 @@
 path = require 'path'
 _ = require 'underscore'
-mr = require 'Mr.Async'
 Q = require 'q'
 fs = require('fs')
 {resemble} = require 'resemble'
