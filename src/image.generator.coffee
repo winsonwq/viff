@@ -1,6 +1,5 @@
 path = require 'path'
 _ = require 'underscore'
-mr = require 'Mr.Async'
 fs = require 'fs'
 wrench = require 'wrench'
 {EventEmitter} = require('events')

@@ -27,13 +27,14 @@
   "dependencies": {
     "Mr.Async": "~0.3.1",
     "underscore": "*",
-    "selenium-webdriver": ">=2.33.0",
     "handlebars": "~1.0.12",
     "resemble": "~1.0.3",
     "wrench": "*",
     "colors": "*",
     "canvas": "~1.0.3",
-    "webdriver-helper": "~0.2.1"
+    "webdriver-helper": "*",
+    "selenium-webdriver": "~2.40.0",
+    "q": "~1.0.0"
   },
   "devDependencies": {
     "grunt": "~0.4.1",

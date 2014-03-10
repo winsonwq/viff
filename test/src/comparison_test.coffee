@@ -19,7 +19,7 @@ module.exports =
 
     @comparison = new Comparison @imgWithEnvs
 
-    sinon.stub(Comparison, 'compare').callsArgWith 2, @diffObj
+    sinon.stub(Comparison, 'compare').callsArgWithAsync 2, @diffObj
 
     callback()
   tearDown: (callback) ->
@@ -36,12 +36,11 @@ module.exports =
     test.done()
 
   'it should find diff when build and prod': (test) ->
-    callback = sinon.spy()
-    @comparison.diff callback
+    callback = => 
+      test.equals @comparison.images.diff.toString('base64'), 'ABCD'
+      test.done()
 
-    test.ok callback.calledOnce
-    test.equals @comparison.images.diff.toString('base64'), 'ABCD'
-    test.done()
+    @comparison.diff callback
 
   'it should get correct diff property': (test) ->
     @comparison.diff =>
