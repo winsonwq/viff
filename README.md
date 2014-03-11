@@ -63,12 +63,12 @@ module.exports = {
     '/page4',
     '/page5',
     '/strict-mode',
-    ['/', function clickLink(browser, webdriver) {
-      browser.findElement(webdriver.By.partialLinkText('viff')).click();
+    ['/', function clickLink(browser) {
+      browser.elementByPartialLinkText('viff').click();
     }],
-    ['/', '#main-content'/*, function (browser, webdriver) { } */],
-    { 'this is a testcase description' : ['/', '#main-content', function(browser, webdriver) {
-      browser.window().maximize();
+    ['/', '#main-content'/*, function (browser) { } */],
+    { 'this is a testcase description' : ['/', '#main-content', function(browser) {
+      browser.maximize();
     }]}
   ],
   reportFormat: 'file'
@@ -98,12 +98,21 @@ viff.takeScreenshot('firefox', 'http://localhost:3000', ['path1', '#css-selecor'
 
 // responsive of web pages
 function size(width) {
-  return function (driver, webdriver) {
-    driver.manage().window().setSize(width, 600 /* any height*/);
+  return function (driver) {
+    driver.setWindowSize(width, 600 /* any height*/);
   };
 }
 
 viff.takeScreenshot('firefox', 'http://localhost:3000', ['path', size(1024)], function (bufferImg) {});
+
+// Q promise
+viff.takeScreenshot('firefox', 'http://localhost:3000', ['path', size(1024)])
+  .done(function (bufferImg) {
+    /* generate image here */
+  })
+  .catch(function (err) {
+    /* handle err here */
+  })
 
 // using browserstack
 viff = new Viff('http://hub.browserstack.com/wd/hub');
@@ -122,6 +131,10 @@ viff.takeScreenshot({
 repo for viff reporter is [ViffReport](https://github.com/xjsi/ViffReport)
 
 # History
+2014-03-11 **viff@0.8.0** use [`wd`](https://github.com/admc/wd) to replace `selenium-webdriver`, so that you could use beautiful [Q Promised API](https://github.com/admc/wd/blob/master/doc/api.md) in your code.
+
+---
+
 2014-02-26 **viff@0.7.6** simplify console output [DEMO](https://asciinema.org/a/7903).
 
 2014-02-17 **viff@0.7.2** make viff programmable.
