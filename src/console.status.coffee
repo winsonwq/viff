@@ -32,4 +32,3 @@ module.exports = (viff) ->
         console.error message
 
       console.error ''
-      process.exit 1

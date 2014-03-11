@@ -4,8 +4,8 @@ util = require 'util'
 {EventEmitter} = require 'events'
 
 Q = require 'q'
+async = require 'async'
 wd = require 'wd'
-webdriver = require 'selenium-webdriver'
 Comparison = require './comparison'
 Testcase = require './testcase'
 Capability = require './capability'
@@ -20,7 +20,7 @@ class Viff extends EventEmitter
   takeScreenshot: (capability, host, url, callback) -> 
     that = @
     defer = Q.defer()
-    defer.promise.done callback
+    defer.promise.then callback
 
     capability = new Capability capability
 
@@ -32,15 +32,14 @@ class Viff extends EventEmitter
     driver.get host + parsedUrl
     preHandle driver if _.isFunction preHandle
 
-    driver.takeScreenshot (err, base64Img) -> 
-      return defer.resolve ['', ex] if err
-
+    driver.takeScreenshot((err, base64Img) -> 
       if _.isString selector
-        Viff.dealWithPartial base64Img, driver, selector, (err, partialImgBuffer) ->
-          defer.resolve ['', err] if err
-          defer.resolve [partialImgBuffer, null]
+        Viff.dealWithPartial(base64Img, driver, selector, defer.resolve)
+          .catch defer.reject
       else
-        defer.resolve [new Buffer(base64Img, 'base64'), null]
+        defer.resolve new Buffer(base64Img, 'base64')
+      )
+      .catch defer.reject
 
     defer.promise
 
@@ -71,34 +70,38 @@ class Viff extends EventEmitter
     endQueue = (index) ->
       if index == cases.length - 1
         endTime = Date.now() - start
-        
         that.emit 'after', cases, endTime
         defer.resolve [cases, endTime]
 
         that.closeDrivers()
 
-    cases.reduce (soFar, _case, index) -> 
+    async.each cases, (_case, next) -> 
       startcase = Date.now()
       that.emit 'beforeEach', _case, 0
 
       compareFrom = that.takeScreenshot _case.from.capability, _case.from.host, _case.url
       compareTo = that.takeScreenshot _case.to.capability, _case.to.host, _case.url
 
-      next = Q.spread [compareFrom, compareTo], ([fromImage, fromImgEx], [toImage, toImgEx]) ->
-        if fromImgEx isnt null or toImgEx isnt null
-          that.emit 'afterEach', _case, 0, fromImgEx, toImgEx
-          endQueue index
-        else 
+      Q.allSettled([compareFrom, compareTo]).then ([fs, ts]) ->
+        if fs.reason or ts.reason
+          that.emit 'afterEach', _case, 0, fs.reason, ts.reason
+          next()
+        else
+          [fromImage, toImage] = [fs.value, ts.value]
           imgWithEnvs = _.object [[_case.from.capability.key() + '-' + _case.from.name, fromImage], [_case.to.capability.key() + '-' + _case.to.name, toImage]]
           comparison = new Comparison imgWithEnvs
           
           comparison.diff (diffImg) ->
             _case.result = comparison
             that.emit 'afterEach', _case, Date.now() - startcase
-            endQueue index
+            next()
 
-      soFar.then next
-    , Q()
+    , (err) ->
+      endTime = Date.now() - start
+      that.emit 'after', cases, endTime
+      defer.resolve [cases, endTime]
+
+      that.closeDrivers()
 
     defer.promise
 
@@ -106,22 +109,16 @@ class Viff extends EventEmitter
     @drivers[browser].quit() for browser of @drivers
 
   @dealWithPartial: (base64Img, driver, selector, callback) ->
-    defer = Q.defer()
-    defer.promise.done callback
-
-    driver.elementByCss selector, (err, elem) ->
-      defer.resolve err, null if err
-
-      elem && elem.getLocation (err, location) ->
-        elem.getSize (err, size) ->
+    driver.elementByCss(selector)
+      .then((elem) ->
+        Q.all [elem.getLocation(), elem.getSize()], ([location, size]) ->
           cvs = new Canvas(size.width, size.height)
           ctx = cvs.getContext '2d'
           img = new Canvas.Image
           img.src = new Buffer base64Img, 'base64'
           ctx.drawImage img, location.x, location.y, size.width, size.height, 0, 0, size.width, size.height
-
-          defer.resolve [null, cvs.toBuffer()]
-          
-    defer.promise
+          cvs.toBuffer()
+      )
+      .then callback
 
 module.exports = Viff
