@@ -23,23 +23,27 @@ class Viff extends EventEmitter
     defer.promise.then callback
 
     capability = new Capability capability
-
     unless driver = @drivers[capability.key()]
       @drivers[capability.key()] = driver = @builder.init capability
 
     [parsedUrl, selector, preHandle] = Testcase.parseUrl url
 
-    driver.get host + parsedUrl
-    preHandle driver if _.isFunction preHandle
+    driver.get(host + parsedUrl).then ->
 
-    driver.takeScreenshot((err, base64Img) -> 
-      if _.isString selector
-        Viff.dealWithPartial(base64Img, driver, selector, defer.resolve)
-          .catch defer.reject
+      if _.isFunction preHandle
+        prepromise = Q.fcall () -> preHandle driver
       else
-        defer.resolve new Buffer(base64Img, 'base64')
-      )
-      .catch defer.reject
+        prepromise = Q()
+
+      prepromise.then ->
+        driver.takeScreenshot((err, base64Img) -> 
+          if _.isString selector
+            Viff.dealWithPartial(base64Img, driver, selector, defer.resolve)
+              .catch defer.reject
+          else
+            defer.resolve new Buffer(base64Img, 'base64')
+          )
+          .catch defer.reject
 
     defer.promise
 
@@ -75,26 +79,27 @@ class Viff extends EventEmitter
 
         that.closeDrivers()
 
-    async.each cases, (_case, next) -> 
+    async.eachSeries cases, (_case, next) -> 
       startcase = Date.now()
       that.emit 'beforeEach', _case, 0
 
       compareFrom = that.takeScreenshot _case.from.capability, _case.from.host, _case.url
-      compareTo = that.takeScreenshot _case.to.capability, _case.to.host, _case.url
+      Q.allSettled([compareFrom]).then ([fs]) -> 
 
-      Q.allSettled([compareFrom, compareTo]).then ([fs, ts]) ->
-        if fs.reason or ts.reason
-          that.emit 'afterEach', _case, 0, fs.reason, ts.reason
-          next()
-        else
-          [fromImage, toImage] = [fs.value, ts.value]
-          imgWithEnvs = _.object [[_case.from.capability.key() + '-' + _case.from.name, fromImage], [_case.to.capability.key() + '-' + _case.to.name, toImage]]
-          comparison = new Comparison imgWithEnvs
-          
-          comparison.diff (diffImg) ->
-            _case.result = comparison
-            that.emit 'afterEach', _case, Date.now() - startcase
+        compareTo = that.takeScreenshot _case.to.capability, _case.to.host, _case.url
+        Q.allSettled([compareTo]).then ([ts]) ->
+          if fs.reason or ts.reason
+            that.emit 'afterEach', _case, 0, fs.reason, ts.reason
             next()
+          else
+            [fromImage, toImage] = [fs.value, ts.value]
+            imgWithEnvs = _.object [[_case.from.capability.key() + '-' + _case.from.name, fromImage], [_case.to.capability.key() + '-' + _case.to.name, toImage]]
+            comparison = new Comparison imgWithEnvs
+            
+            comparison.diff (diffImg) ->
+              _case.result = comparison
+              that.emit 'afterEach', _case, Date.now() - startcase
+              next()
 
     , (err) ->
       endTime = Date.now() - start
@@ -111,7 +116,7 @@ class Viff extends EventEmitter
   @dealWithPartial: (base64Img, driver, selector, callback) ->
     driver.elementByCss(selector)
       .then((elem) ->
-        Q.all [elem.getLocation(), elem.getSize()], ([location, size]) ->
+        Q.all([elem.getLocation(), elem.getSize()]).then ([location, size]) ->
           cvs = new Canvas(size.width, size.height)
           ctx = cvs.getContext '2d'
           img = new Canvas.Image

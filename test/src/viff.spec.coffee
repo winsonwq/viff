@@ -25,7 +25,7 @@ describe 'viff', ->
       takeScreenshot: ->
       quit: ->
 
-    @getUrl = sinon.spy @driver, 'get'
+    @getUrl = sinon.stub(@driver, 'get').returns Q()
 
     @init = sinon.stub(@viff.builder, 'init').returns(@driver)
     sinon.stub(@driver, 'takeScreenshot').callsArgWithAsync(0, null, 'base64string').returns Q()
