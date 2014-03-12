@@ -64,11 +64,12 @@ module.exports = {
     '/page5',
     '/strict-mode',
     ['/', function clickLink(browser) {
-      browser.elementByPartialLinkText('viff').click();
+      // need to return a promise
+      return browser.elementByPartialLinkText('viff').click();
     }],
     ['/', '#main-content'/*, function (browser) { } */],
     { 'this is a testcase description' : ['/', '#main-content', function(browser) {
-      browser.maximize();
+      return browser.maximize();
     }]}
   ],
   reportFormat: 'file'
