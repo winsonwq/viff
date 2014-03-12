@@ -1,6 +1,6 @@
 path = require 'path'
 _ = require 'underscore'
-mr = require 'Mr.Async'
+Q = require 'q'
 fs = require('fs')
 {resemble} = require 'resemble'
 
@@ -9,7 +9,8 @@ class Comparison
     @images = imgWithEnvs
 
   diff: (callback) ->
-    defer = mr.Deferred().done callback
+    defer = Q.defer()
+    promise = defer.promise.done callback
 
     that = @
     fileData = _.values(@images)
@@ -26,14 +27,15 @@ class Comparison
 
         defer.resolve that.images.diff
 
-    defer.promise()
+    promise
 
   @compare: (fileAData, fileBData, callback) ->
-    defer = mr.Deferred().done callback
+    defer = Q.defer()
+    promise = defer.promise.done callback
 
     resemble(fileAData).compareTo(fileBData).onComplete (data) ->
       defer.resolve data
 
-    defer.promise()
+    promise
 
 module.exports = Comparison

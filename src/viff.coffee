@@ -1,53 +1,51 @@
-mr = require 'Mr.Async'
 _ = require 'underscore'
 Canvas = require 'canvas'
 util = require 'util'
 {EventEmitter} = require 'events'
 
-webdriver = require 'selenium-webdriver'
+Q = require 'q'
+async = require 'async'
+wd = require 'wd'
 Comparison = require './comparison'
 Testcase = require './testcase'
 Capability = require './capability'
-
-webdriver.promise.controlFlow().on 'uncaughtException', (e) -> 
-  console.error 'Unhandled error: ' + e
 
 class Viff extends EventEmitter
   constructor: (seleniumHost) ->
     EventEmitter.call @
 
-    @builder = new webdriver.Builder().usingServer(seleniumHost)
+    @builder = wd.promiseChainRemote seleniumHost
     @drivers = {}
 
   takeScreenshot: (capability, host, url, callback) -> 
     that = @
-    defer = mr.Deferred().done(callback)
+    defer = Q.defer()
+    defer.promise.then callback
 
     capability = new Capability capability
-
     unless driver = @drivers[capability.key()]
-      @builder = @builder.withCapabilities capability
-      driver = @builder.build()
-      @drivers[capability.key()] = driver
+      @drivers[capability.key()] = driver = @builder.init capability
 
     [parsedUrl, selector, preHandle] = Testcase.parseUrl url
 
-    driver.get host + parsedUrl
-    preHandle driver, webdriver if _.isFunction preHandle
+    driver.get(host + parsedUrl).then ->
 
-    driver.call( ->
-      driver.takeScreenshot().then (base64Img) -> 
-        if _.isString selector
-          Viff.dealWithPartial base64Img, driver, selector, (partialImgBuffer) ->
-            defer.resolve partialImgBuffer, null
-        else
-          defer.resolve new Buffer(base64Img, 'base64'), null
+      if _.isFunction preHandle
+        prepromise = Q.fcall () -> preHandle driver
+      else
+        prepromise = Q()
 
-      return
-    ).addErrback (ex) ->
-      defer.resolve '', ex
+      prepromise.then ->
+        driver.takeScreenshot((err, base64Img) -> 
+          if _.isString selector
+            Viff.dealWithPartial(base64Img, driver, selector, defer.resolve)
+              .catch defer.reject
+          else
+            defer.resolve new Buffer(base64Img, 'base64')
+          )
+          .catch defer.reject
 
-    defer.promise()
+    defer.promise
 
   @constructCases: (capabilities, envHosts, links) ->
     cases = []
@@ -66,59 +64,66 @@ class Viff extends EventEmitter
     cases
 
   run: (cases, callback) ->
-    defer = mr.Deferred().done callback
+    defer = Q.defer()
+    defer.promise.done callback
     that = this
 
     @emit 'before', cases
     start = Date.now()
 
-    mr.asynEach(cases, (_case) ->
-      iterator = this
+    endQueue = (index) ->
+      if index == cases.length - 1
+        endTime = Date.now() - start
+        that.emit 'after', cases, endTime
+        defer.resolve [cases, endTime]
+
+        that.closeDrivers()
+
+    async.eachSeries cases, (_case, next) -> 
       startcase = Date.now()
-
       that.emit 'beforeEach', _case, 0
-      that.takeScreenshot _case.from.capability, _case.from.host, _case.url, (fromImage, fromImgEx) ->
-        that.takeScreenshot _case.to.capability, _case.to.host, _case.url, (toImage, toImgEx) ->
 
-          if fromImgEx isnt null or toImgEx isnt null
-            that.emit 'afterEach', _case, 0, fromImgEx, toImgEx
-            iterator.next()
-          else 
+      compareFrom = that.takeScreenshot _case.from.capability, _case.from.host, _case.url
+      Q.allSettled([compareFrom]).then ([fs]) -> 
+
+        compareTo = that.takeScreenshot _case.to.capability, _case.to.host, _case.url
+        Q.allSettled([compareTo]).then ([ts]) ->
+          if fs.reason or ts.reason
+            that.emit 'afterEach', _case, 0, fs.reason, ts.reason
+            next()
+          else
+            [fromImage, toImage] = [fs.value, ts.value]
             imgWithEnvs = _.object [[_case.from.capability.key() + '-' + _case.from.name, fromImage], [_case.to.capability.key() + '-' + _case.to.name, toImage]]
             comparison = new Comparison imgWithEnvs
             
             comparison.diff (diffImg) ->
               _case.result = comparison
               that.emit 'afterEach', _case, Date.now() - startcase
+              next()
 
-              iterator.next()
-    , -> 
+    , (err) ->
       endTime = Date.now() - start
-      that.closeDrivers()
       that.emit 'after', cases, endTime
+      defer.resolve [cases, endTime]
 
-      defer.resolve cases, endTime
-    ).start()
+      that.closeDrivers()
 
-    defer.promise()
+    defer.promise
 
   closeDrivers: () ->
     @drivers[browser].quit() for browser of @drivers
 
   @dealWithPartial: (base64Img, driver, selector, callback) ->
-    defer = mr.Deferred().done callback
-
-    driver.findElement(webdriver.By.css(selector)).then (elem) ->
-      elem.getLocation().then (location) ->
-        elem.getSize().then (size) ->
+    driver.elementByCss(selector)
+      .then((elem) ->
+        Q.all([elem.getLocation(), elem.getSize()]).then ([location, size]) ->
           cvs = new Canvas(size.width, size.height)
           ctx = cvs.getContext '2d'
           img = new Canvas.Image
           img.src = new Buffer base64Img, 'base64'
           ctx.drawImage img, location.x, location.y, size.width, size.height, 0, 0, size.width, size.height
-
-          defer.resolve cvs.toBuffer()
-
-    defer.promise()
+          cvs.toBuffer()
+      )
+      .then callback
 
 module.exports = Viff
