@@ -93,10 +93,9 @@ class Viff extends EventEmitter
             that.emit 'afterEach', _case, 0, fs.reason, ts.reason
             next()
           else
-            that.runCase(_case, fs.value, ts.value).then ->
+            Viff.runCase(_case, fs.value, ts.value).then (c) ->
               that.emit 'afterEach', _case, Date.now() - startcase, fs.reason, ts.reason
               next()
-          
 
     , (err) ->
       endTime = Date.now() - start
@@ -107,11 +106,14 @@ class Viff extends EventEmitter
 
     defer.promise
 
-  runCase: (_case, fromImage, toImage, callback) ->
+  @runCase: (_case, fromImage, toImage, callback) ->
     imgWithEnvs = _.object [[_case.from.capability.key() + '-' + _case.from.name, fromImage], [_case.to.capability.key() + '-' + _case.to.name, toImage]]
     comparison = new Comparison imgWithEnvs
     
-    diff = comparison.diff (diffImg) -> _case.result = comparison
+    diff = comparison.diff (diffImg) -> 
+      _case.result = comparison
+      _case
+
     callback && diff.then callback
     
     diff

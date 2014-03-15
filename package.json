@@ -32,7 +32,9 @@
     "canvas": "~1.0.3",
     "q": "~1.0.0",
     "async": "~0.2.10",
-    "wd": "~0.2.12"
+    "wd": "~0.2.12",
+    "connect": "^2.14.2",
+    "connect-multiparty": "^1.0.3"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -52,7 +54,8 @@
   ],
   "bin": {
     "viff": "./bin/viff",
-    "viffstream": "./bin/viffstream"
+    "viffstream": "./bin/viffstream",
+    "viffserver": "./bin/viffserver"
   },
   "scripts": {
     "build": "coffee -o ./lib/ -c src/*.coffee",
