@@ -17,6 +17,7 @@ module.exports = (grunt) ->
           'lib/comparison.js': 'src/comparison.coffee',
           'lib/index.js': 'src/index.coffee',
           'lib/index.stream.js': 'src/index.stream.coffee',
+          'lib/server/index.server.js': 'src/server/index.server.coffee',
           'lib/color.helper.js': 'src/color.helper.coffee',
           'lib/process.argv.js': 'src/process.argv.coffee',
           'lib/image.generator.js': 'src/image.generator.coffee',

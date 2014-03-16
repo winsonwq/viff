@@ -10,7 +10,7 @@ class Comparison
 
   diff: (callback) ->
     defer = Q.defer()
-    promise = defer.promise.done callback
+    promise = defer.promise.then callback
 
     that = @
     fileData = _.values(@images)
@@ -31,7 +31,7 @@ class Comparison
 
   @compare: (fileAData, fileBData, callback) ->
     defer = Q.defer()
-    promise = defer.promise.done callback
+    promise = defer.promise.then callback
 
     resemble(fileAData).compareTo(fileBData).onComplete (data) ->
       defer.resolve data
