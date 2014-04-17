@@ -127,7 +127,6 @@ viff.takeScreenshot({
 ```
 
 ## file report embeded in viff reporter
-![file report example](http://ww2.sinaimg.cn/mw1024/64eae748jw1e7fmlo9otwj21kw0vrqe5.jpg)
 
 repo for viff reporter is [ViffReport](https://github.com/xjsi/ViffReport)
 
@@ -185,4 +184,3 @@ OTHER DEALINGS IN THE SOFTWARE.
 
 
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/winsonwq/viff/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
