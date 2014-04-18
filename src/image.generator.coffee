@@ -64,7 +64,7 @@ _.extend ImageGenerator,
         compares[_case.browser] = compares[_case.browser] || {}
         compares[_case.browser][_case.key()] = _case.result
 
-        differences.push _case if _case.result.misMatchPercentage isnt 0
+        differences.push _case if _case.result.misMatchPercentage > _case.misMatchPercentage
         totalAnalysisTime += _case.result.analysisTime
       else
         differences.push _case

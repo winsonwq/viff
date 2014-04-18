@@ -24,14 +24,15 @@ parseEnvHosts = (value) ->
 parsePaths = (value) ->
   (p.trim() for p in value.split(',') when !_.isEmpty(p.trim()))
 
-mergeAndValidateConfig = (seleniumHost, browsers, envHosts, paths, reportFormat, grep, config) ->
+mergeAndValidateConfig = (seleniumHost, browsers, envHosts, paths, reportFormat, grep, misMatchPercentage, config) ->
   c = _.extend {}, config
 
-  for name, idx in ['seleniumHost', 'browsers', 'envHosts', 'paths', 'reportFormat', 'grep']
+  for name, idx in ['seleniumHost', 'browsers', 'envHosts', 'paths', 'reportFormat', 'grep', 'misMatchPercentage']
     c[name] = arguments[idx] || c[name]
 
   c.browsers = ['firefox'] if c.browsers is undefined or c.browsers.length == 0
   c.reportFormat = 'html' if c.reportFormat is undefined
+  c.misMatchPercentage = 0 if c.misMatchPercentage is undefined
 
   throw new Error('--selenium-host isn\'t set correctly') if c.seleniumHost is undefined
   throw new Error('-envs aren\'t set correctly.') if c.envHosts is undefined or _.keys(c.envHosts).length < 1
@@ -98,6 +99,9 @@ processArgv = (args) ->
         when '--selenium-host'
           seleniumHost = args.shift().trim()
 
+        when '-misMatchPercentage'
+          misMatchPercentage = args.shift().trim()
+
         when '-grep'
           grep = args.shift().trim()
 
@@ -105,7 +109,7 @@ processArgv = (args) ->
           if arg.indexOf('.config.js') > 0
             config = require path.resolve process.cwd(), arg
 
-  c = mergeAndValidateConfig seleniumHost, browsers, envHosts, paths, reportFormat, grep, config
+  c = mergeAndValidateConfig seleniumHost, browsers, envHosts, paths, reportFormat, grep, misMatchPercentage, config
   c.paths = filterByGrep(c.paths, grep) if grep
   c
 
