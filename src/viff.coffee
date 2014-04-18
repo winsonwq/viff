@@ -47,7 +47,7 @@ class Viff extends EventEmitter
 
     defer.promise
 
-  @constructCases: (capabilities, envHosts, links) ->
+  @constructCases: (capabilities, envHosts, links, misMatchPercentage) ->
     cases = []
     _.each links, (url) ->
       _.each capabilities, (capability) ->
@@ -56,10 +56,10 @@ class Viff extends EventEmitter
           [capabilityFrom, capabilityTo] = capability
 
           _.each envHosts, (host, envName) ->
-            cases.push new Testcase(capabilityFrom, capabilityTo, host, host, envName, envName, url)
+            cases.push new Testcase(capabilityFrom, capabilityTo, host, host, envName, envName, url, misMatchPercentage)
         else
           [[from, envFromHost], [to, envToHost]] = _.pairs envHosts
-          cases.push new Testcase(capability, capability, envFromHost, envToHost, from, to, url)
+          cases.push new Testcase(capability, capability, envFromHost, envToHost, from, to, url, misMatchPercentage)
 
     cases
 
@@ -88,17 +88,13 @@ class Viff extends EventEmitter
 
         compareTo = that.takeScreenshot _case.to.capability, _case.to.host, _case.url
         Q.allSettled([compareTo]).then ([ts]) ->
+
           if fs.reason or ts.reason
             that.emit 'afterEach', _case, 0, fs.reason, ts.reason
             next()
           else
-            [fromImage, toImage] = [fs.value, ts.value]
-            imgWithEnvs = _.object [[_case.from.capability.key() + '-' + _case.from.name, fromImage], [_case.to.capability.key() + '-' + _case.to.name, toImage]]
-            comparison = new Comparison imgWithEnvs
-            
-            comparison.diff (diffImg) ->
-              _case.result = comparison
-              that.emit 'afterEach', _case, Date.now() - startcase
+            Viff.runCase(_case, fs.value, ts.value).then (c) ->
+              that.emit 'afterEach', _case, Date.now() - startcase, fs.reason, ts.reason
               next()
 
     , (err) ->
@@ -109,6 +105,18 @@ class Viff extends EventEmitter
       that.closeDrivers()
 
     defer.promise
+
+  @runCase: (_case, fromImage, toImage, callback) ->
+    imgWithEnvs = _.object [[_case.from.capability.key() + '-' + _case.from.name, fromImage], [_case.to.capability.key() + '-' + _case.to.name, toImage]]
+    comparison = new Comparison imgWithEnvs
+    
+    diff = comparison.diff (diffImg) -> 
+      _case.result = comparison
+      _case
+
+    callback && diff.then callback
+    
+    diff
 
   closeDrivers: () ->
     @drivers[browser].quit() for browser of @drivers

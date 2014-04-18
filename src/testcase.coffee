@@ -3,7 +3,7 @@ Capability = require './capability'
 
 class Testcase
 
-  constructor: (capablityFrom, capabilityTo, hostFrom, hostTo, nameFrom, nameTo, @url) ->
+  constructor: (capablityFrom, capabilityTo, hostFrom, hostTo, nameFrom, nameTo, @url, @misMatchPercentage) ->
 
     capablityFrom = new Capability capablityFrom
     capabilityTo = new Capability capabilityTo

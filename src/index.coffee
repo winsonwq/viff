@@ -23,5 +23,5 @@ if config.reportFormat == 'file'
   # generate report.json  
   viff.on 'after', (cases, duration) -> imgGen.generateReport cases
 
-cases = Viff.constructCases config.browsers, config.envHosts, config.paths
+cases = Viff.constructCases config.browsers, config.envHosts, config.paths, config.misMatchPercentage
 viff.run cases
