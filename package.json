@@ -1,7 +1,7 @@
 {
   "name": "viff",
   "description": "Find virtual differences between web pages in different environments(developing, staging, production) and browsers.",
-  "version": "0.8.4",
+  "version": "0.8.5",
   "homepage": "https://github.com/winsonwq/viff",
   "author": {
     "name": "Wang Qiu",
@@ -32,7 +32,9 @@
     "canvas": "latest",
     "q": "latest",
     "async": "~0.2.10",
-    "wd": "latest"
+    "wd": "~0.2.12",
+    "connect": "^2.14.2",
+    "connect-multiparty": "^1.0.3"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
@@ -52,7 +54,8 @@
   ],
   "bin": {
     "viff": "./bin/viff",
-    "viffstream": "./bin/viffstream"
+    "viffstream": "./bin/viffstream",
+    "viffserver": "./bin/viffserver"
   },
   "scripts": {
     "build": "coffee -o ./lib/ -c src/*.coffee",

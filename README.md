@@ -33,6 +33,7 @@ Checkout [`viff-examples`](https://github.com/winsonwq/viff-examples) reporsitor
 8. Multiple Environments
 9. Browserstack
 10. Programmable
+11. Using Viff Server (beta)
 
 ### Quick example
 
@@ -130,7 +131,22 @@ viff.takeScreenshot({
 
 repo for viff reporter is [ViffReport](https://github.com/xjsi/ViffReport)
 
+## Using Viff Server (beta)
+
+You could try `viffserver` and [`viff-client`](https://github.com/winsonwq/viff-client) to do the viff testing with your functional testing.
+
+Run the viff server first.
+
+```
+$ viffserver
+```
+
+And integrated `viffclient.post` method in your functional testing code. Check more in [Viff Examples](https://github.com/winsonwq/viff-examples) or [Viff Client](https://github.com/winsonwq/viff-client).
+
 # History
+
+2014-03-15 **viff@0.8.2** could setup viff server and wait for screenshots from the place out of viff. Check out the [`viff client`](https://github.com/winsonwq/viff-client) example.
+
 2014-03-11 **viff@0.8.0** use [`wd`](https://github.com/admc/wd) to replace `selenium-webdriver`, so that you could use beautiful [Q Promised API](https://github.com/admc/wd/blob/master/doc/api.md) in your code.
 
 ---
