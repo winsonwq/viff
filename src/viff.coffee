@@ -17,7 +17,7 @@ class Viff extends EventEmitter
     @builder = wd.promiseChainRemote seleniumHost
     @drivers = {}
 
-  takeScreenshot: (capability, host, url, callback) -> 
+  takeScreenshot: (capability, host, url, callback) ->
     that = @
     defer = Q.defer()
     defer.promise.then callback
@@ -31,12 +31,12 @@ class Viff extends EventEmitter
     driver.get(host + parsedUrl).then ->
 
       if _.isFunction preHandle
-        prepromise = Q.fcall () -> preHandle driver
+        prepromise = Q.fcall () -> preHandle driver, wd
       else
         prepromise = Q()
 
       prepromise.then ->
-        driver.takeScreenshot((err, base64Img) -> 
+        driver.takeScreenshot((err, base64Img) ->
           if _.isString selector
             Viff.dealWithPartial(base64Img, driver, selector, defer.resolve)
               .catch defer.reject
@@ -79,12 +79,12 @@ class Viff extends EventEmitter
 
         that.closeDrivers()
 
-    async.eachSeries cases, (_case, next) -> 
+    async.eachSeries cases, (_case, next) ->
       startcase = Date.now()
       that.emit 'beforeEach', _case, 0
 
       compareFrom = that.takeScreenshot _case.from.capability, _case.from.host, _case.url
-      Q.allSettled([compareFrom]).then ([fs]) -> 
+      Q.allSettled([compareFrom]).then ([fs]) ->
 
         compareTo = that.takeScreenshot _case.to.capability, _case.to.host, _case.url
         Q.allSettled([compareTo]).then ([ts]) ->
@@ -95,7 +95,7 @@ class Viff extends EventEmitter
             [fromImage, toImage] = [fs.value, ts.value]
             imgWithEnvs = _.object [[_case.from.capability.key() + '-' + _case.from.name, fromImage], [_case.to.capability.key() + '-' + _case.to.name, toImage]]
             comparison = new Comparison imgWithEnvs
-            
+
             comparison.diff (diffImg) ->
               _case.result = comparison
               that.emit 'afterEach', _case, Date.now() - startcase
