@@ -3,11 +3,11 @@ http = require 'http'
 multipart = require 'connect-multiparty'
 fs = require 'fs'
 
-Viff = require '../viff'
-imgGen = require '../image.generator'
-Testcase = require '../testcase'
-Capability = require '../capability'
-require '../color.helper.js'
+Viff = require './viff'
+imgGen = require './image.generator'
+Testcase = require './testcase'
+Capability = require './capability'
+require './color.helper.js'
 
 cases = {}
 endSignal = 0
