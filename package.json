@@ -1,7 +1,7 @@
 {
   "name": "viff",
   "description": "Find virtual differences between web pages in different environments(developing, staging, production) and browsers.",
-  "version": "0.8.1",
+  "version": "0.8.2",
   "homepage": "https://github.com/winsonwq/viff",
   "author": {
     "name": "Wang Qiu",
@@ -29,10 +29,10 @@
     "resemble": "~1.0.3",
     "wrench": "*",
     "colors": "*",
-    "canvas": "~1.0.3",
-    "q": "~1.0.0",
+    "canvas": "latest",
+    "q": "latest",
     "async": "~0.2.10",
-    "wd": "~0.2.12"
+    "wd": "latest"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
