@@ -26,14 +26,14 @@ handleTestcase = (req, callback) ->
   tkey = Testcase.getPathKey url
 
   unless cases[tkey]
-    cases[tkey] = capabilities : [], names: [], hosts: [], screenshots: [] 
+    cases[tkey] = capabilities : [], names: [], hosts: [], screenshots: []
 
   prepareCachedCase(
-    cases[tkey], 
+    cases[tkey],
     new Capability(JSON.parse req.body.capabilities),
-    req.body.host, 
-    req.body.name, 
-    url, 
+    req.body.host,
+    req.body.name,
+    url,
     fs.readFileSync(req.files.image.path)
   )
 
@@ -51,24 +51,28 @@ handleTestcase = (req, callback) ->
       resolvedCases.push _case
       console.log "  - #{_case.browser.info} #{_case.key().greyColor}"
       callback && callback(null, _case)
-  else 
+  else
     callback && callback()
 
 caseHandler = (req, resp) ->
+
   if req.method is 'POST' and req.url is '/'
     handleTestcase req, ->
       resp.end()
-
-  else resp.end()
+  else if req.method is 'GET'
+    if resolvedCases.length > 0 and req.url is '/generate-report'
+      imgGen.generateReport resolvedCases
+      console.log '  report.json generated.'
+      resp.end()
+    else if req.url is '/end'
+      console.log '  Done.'
+      resp.end()
+      process.exit 0
+  else
+    resp.end()
 
 app = connect()
 app.use(multipart()).use(caseHandler)
-
-process.on 'SIGINT', ->
-  if resolvedCases.length > 0
-    imgGen.generateReport resolvedCases
-    console.log '\nDone.'
-  process.exit 0
 
 imgGen.reset()
 http.createServer(app).listen(3000);
