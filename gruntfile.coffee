@@ -1,23 +1,23 @@
 'use strict';
 
-module.exports = (grunt) -> 
+module.exports = (grunt) ->
 
   # Project configuration.
   grunt.initConfig
 
     source: ['src/**/*.coffee', 'test/**/*.coffee', 'gruntfile.coffee'],
 
-    nodeunit: 
+    nodeunit:
       all: ['test/**/*_test.js']
 
-    coffee: 
-      compile: 
-        files: 
+    coffee:
+      compile:
+        files:
           'lib/viff.js': 'src/viff.coffee',
           'lib/comparison.js': 'src/comparison.coffee',
           'lib/index.js': 'src/index.coffee',
           'lib/index.stream.js': 'src/index.stream.coffee',
-          'lib/server/index.server.js': 'src/server/index.server.coffee',
+          'lib/index.server.js': 'src/index.server.coffee',
           'lib/color.helper.js': 'src/color.helper.coffee',
           'lib/process.argv.js': 'src/process.argv.coffee',
           'lib/image.generator.js': 'src/image.generator.coffee',
@@ -36,7 +36,7 @@ module.exports = (grunt) ->
       coffee:
         files: '<%= source %>'
         tasks: ['coffee']
-      nodeunit: 
+      nodeunit:
         files: '<%= source %>'
         tasks: ['default']
 

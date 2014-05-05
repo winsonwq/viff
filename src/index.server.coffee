@@ -10,8 +10,11 @@ Capability = require './capability'
 require './color.helper.js'
 
 cases = {}
-endSignal = 0
 resolvedCases = []
+
+reset = ->
+  cases = {}
+  resolvedCases.length = 0
 
 prepareCachedCase = (c, capability, host, name, url, screenshot) ->
   c.capabilities.push capability
@@ -62,6 +65,7 @@ caseHandler = (req, resp) ->
   else if req.method is 'GET'
     if resolvedCases.length > 0 and req.url is '/generate-report'
       imgGen.generateReport resolvedCases
+      reset()
       console.log '  report.json generated.'
       resp.end()
     else if req.url is '/end'
