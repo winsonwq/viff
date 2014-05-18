@@ -11,7 +11,7 @@ describe 'capability', ->
     capability.key().should.equal 'firefox'
 
   it 'should have correct structure when set browserstack destop capability object', () ->
-    cap = 
+    cap =
       'browser': 'Chrome'
       'browser_version' : '31.0'
       'os' : 'OS X'
@@ -21,7 +21,7 @@ describe 'capability', ->
     capability.key().should.equal 'OS X - Mavericks - Chrome - 31.0'
 
   it 'should have correct structure when set browserstack mobile capability object', () ->
-    cap = 
+    cap =
       'platform' : 'MAC'
       'browserName' : 'iPhone'
       'device' : 'iPhone 5'

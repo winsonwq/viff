@@ -5,6 +5,7 @@ processArgs = require './process.argv.js'
 consoleStatus = require './console.status.js'
 imgGen = require './image.generator'
 resemble = require './resemble'
+partialCanvas = require './canvas.drawimage'
 
 config = processArgs process.argv
 
@@ -25,6 +26,7 @@ if config.reportFormat == 'file'
   viff.on 'after', (cases, duration) ->
     imgGen.generateReport cases
     resemble.exit()
+    partialCanvas.exit()
 
 cases = Viff.constructCases config.browsers, config.envHosts, config.paths
 viff.run cases

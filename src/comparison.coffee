@@ -4,6 +4,7 @@ Q = require 'q'
 fs = require('fs')
 
 resemble = require './resemble'
+dataUrlHelper = require './image.dataurl.helper'
 
 class Comparison
   constructor: (imgWithEnvs) ->
@@ -19,7 +20,7 @@ class Comparison
     Comparison.compare fileData[0], fileData[1], (diffObj) ->
 
       if diffObj
-        diffBase64 = diffObj.imageDataUrl.replace('data:image/png;base64,', '')
+        diffBase64 = dataUrlHelper.toData diffObj.imageDataUrl
         that.images.diff = new Buffer diffBase64, 'base64'
 
         _.extend that,
@@ -34,12 +35,9 @@ class Comparison
   @compare: (fileAData, fileBData, callback) ->
     defer = Q.defer()
     promise = defer.promise.then callback
-    resemble.compare Comparison.base64fy(fileAData), Comparison.base64fy(fileBData), (data) ->
+    resemble.compare dataUrlHelper.toDataURL(fileAData), dataUrlHelper.toDataURL(fileBData), (data) ->
       defer.resolve data
 
     promise
-
-  @base64fy: (imageBuffer) ->
-    "data:image/png;base64,#{imageBuffer.toString('base64')}"
 
 module.exports = Comparison

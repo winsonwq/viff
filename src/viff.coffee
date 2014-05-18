@@ -1,5 +1,4 @@
 _ = require 'underscore'
-Canvas = require 'canvas'
 util = require 'util'
 {EventEmitter} = require 'events'
 
@@ -9,6 +8,8 @@ wd = require 'wd'
 Comparison = require './comparison'
 Testcase = require './testcase'
 Capability = require './capability'
+partialCanvas = require './canvas.drawimage'
+dataUrlHelper = require './image.dataurl.helper'
 
 class Viff extends EventEmitter
   constructor: (seleniumHost) ->
@@ -125,12 +126,11 @@ class Viff extends EventEmitter
     driver.elementByCss(selector)
       .then((elem) ->
         Q.all([elem.getLocation(), elem.getSize()]).then ([location, size]) ->
-          cvs = new Canvas(size.width, size.height)
-          ctx = cvs.getContext '2d'
-          img = new Canvas.Image
-          img.src = new Buffer base64Img, 'base64'
-          ctx.drawImage img, location.x, location.y, size.width, size.height, 0, 0, size.width, size.height
-          cvs.toBuffer()
+          defer = Q.defer()
+          partialCanvas.drawImage dataUrlHelper.toDataURL(base64Img), location, size, (data) ->
+            defer.resolve new Buffer(dataUrlHelper.toData(data), 'base64')
+
+          defer.promise
       )
       .then callback
 

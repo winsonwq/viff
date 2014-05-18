@@ -145,6 +145,8 @@ And integrated `viffclient.post` method in your functional testing code. Check m
 
 # History
 
+2014-05-18 **viff@0.9.0** finally replace `canvas` by `phantomjs`, so easy installation starts from now, even in Windows System.
+
 2014-03-15 **viff@0.8.2** could setup viff server and wait for screenshots from the place out of viff. Check out the [`viff client`](https://github.com/winsonwq/viff-client) example.
 
 2014-03-11 **viff@0.8.0** use [`wd`](https://github.com/admc/wd) to replace `selenium-webdriver`, so that you could use beautiful [Q Promised API](https://github.com/admc/wd/blob/master/doc/api.md) in your code.
