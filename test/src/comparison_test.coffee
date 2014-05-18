@@ -5,9 +5,9 @@ fs = require 'fs'
 
 child_process = require('child_process')
 
-module.exports = 
+module.exports =
   setUp: (callback) ->
-    @imgWithEnvs = 
+    @imgWithEnvs =
       build: 'abcd'
       prod: 'efgh'
 
@@ -15,7 +15,7 @@ module.exports =
       isSameDimensions: true
       misMatchPercentage: "2.84"
       analysisTime: 54
-      getImageDataUrl: () -> 'ABCD'
+      imageDataUrl: 'ABCD'
 
     @comparison = new Comparison @imgWithEnvs
 
@@ -32,11 +32,11 @@ module.exports =
   'it should have correct properties': (test) ->
     test.equals @comparison.images.build, 'abcd'
     test.equals @comparison.images.prod, 'efgh'
-    
+
     test.done()
 
   'it should find diff when build and prod': (test) ->
-    callback = => 
+    callback = =>
       test.equals @comparison.images.diff.toString('base64'), 'ABCD'
       test.done()
 
@@ -48,4 +48,3 @@ module.exports =
       test.strictEqual @comparison.misMatchPercentage, 2.84
       test.equals @comparison.analysisTime, 54
       test.done()
-

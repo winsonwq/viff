@@ -4,6 +4,7 @@ Viff = require './viff.js'
 processArgs = require './process.argv.js'
 consoleStatus = require './console.status.js'
 imgGen = require './image.generator'
+resemble = require './resemble'
 
 config = processArgs process.argv
 
@@ -19,9 +20,11 @@ if config.reportFormat == 'file'
 
   # generate images by each case
   viff.on 'afterEach', (_case, duration) -> imgGen.generateByCase _case if duration != 0
-    
-  # generate report.json  
-  viff.on 'after', (cases, duration) -> imgGen.generateReport cases
+
+  # generate report.json
+  viff.on 'after', (cases, duration) ->
+    imgGen.generateReport cases
+    resemble.exit()
 
 cases = Viff.constructCases config.browsers, config.envHosts, config.paths
 viff.run cases

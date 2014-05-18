@@ -26,7 +26,6 @@
   },
   "dependencies": {
     "underscore": "*",
-    "resemble": "~1.0.3",
     "wrench": "*",
     "colors": "*",
     "canvas": "latest",
@@ -34,7 +33,8 @@
     "async": "~0.2.10",
     "wd": "~0.2.12",
     "connect": "^2.14.2",
-    "connect-multiparty": "^1.0.3"
+    "connect-multiparty": "^1.0.3",
+    "phantomjs-resemble": "latest"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
