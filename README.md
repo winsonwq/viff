@@ -1,10 +1,10 @@
 # Viff
 
-Find virsual differences between web pages in different environments(developing, staging, production) and browsers.
+Find visual differences between web pages in different environments (developing, staging, production) and browsers.
 
 ## Installation
 
-Viff is running on selenium sever. Don't worry, you can easily set up selenium server by using `wdm`.
+Viff runs on selenium sever. Don't worry, you can easily set up selenium server using `wdm`.
 
 ```
 $ npm install wdm -g
@@ -15,13 +15,13 @@ Then install `viff` command line.
 ```
 npm install -g coffee-script && npm install -g viff
 ```
-No need to install coffee-script if you have.
+No need to install coffee-script if you already have it, of course.
 
-If you meet issue about `node-canvas`. Have a check [node-canvas wiki](https://github.com/LearnBoost/node-canvas/wiki/Installation---OSX)
+If you meet any issues with `node-canvas`, check [node-canvas wiki](https://github.com/LearnBoost/node-canvas/wiki/Installation---OSX)
 
 ## Examples
 
-Checkout [`viff-examples`](https://github.com/winsonwq/viff-examples) reporsitory for more examples including
+Checkout [`viff-examples`](https://github.com/winsonwq/viff-examples) repository for more examples, including:
 
 1. Tiny CSS difference
 2. Chart difference
@@ -43,7 +43,7 @@ Start server
 $ wdm start // open selenium webdriver server
 ```
 
-You could run `xx.config.js` file.
+You could run it using a `xx.config.js` file.
 
 ```javascript
 // build_prod.config.js
