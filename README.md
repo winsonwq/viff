@@ -17,8 +17,6 @@ npm install -g coffee-script && npm install -g viff
 ```
 No need to install coffee-script if you have.
 
-If you meet issue about `node-canvas`. Have a check [node-canvas wiki](https://github.com/LearnBoost/node-canvas/wiki/Installation---OSX)
-
 ## Examples
 
 Checkout [`viff-examples`](https://github.com/winsonwq/viff-examples) reporsitory for more examples including
