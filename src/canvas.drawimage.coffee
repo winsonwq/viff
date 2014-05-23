@@ -7,12 +7,21 @@ class CanvasDrawImage
   constructor: () ->
 
   preparePhantom: (cb) ->
+    platform = if process.platform == 'win32' then 'phantomjs.cmd' else 'phantomjs';
+    usingWeak = process.platform != 'win32';
+
     if !@cachedPh or !@cachedPage
       phantom.create (ph) =>
         ph.createPage (page) =>
           @cachedPh = ph
           @cachedPage = page
           cb.call(this)
+      , {
+        binary: platform,
+        dnodeOpts: {
+          weak: usingWeak
+        }
+      }
     else cb.call(this)
 
   drawImage: (imageDataUrl, location, size, cb) ->
