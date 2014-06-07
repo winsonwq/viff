@@ -26,6 +26,7 @@ module.exports = (grunt) ->
           'lib/testcase.js': 'src/testcase.coffee',
           'lib/capability.js': 'src/capability.coffee',
           'lib/resemble.js': 'src/resemble.coffee',
+          'lib/viffs.js': 'src/viffs.coffee',
           'lib/canvas.drawimage.js': 'src/canvas.drawimage.coffee',
           'lib/image.dataurl.helper.js': 'src/image.dataurl.helper.coffee',
           'test/build/comparison_test.js': 'test/src/comparison_test.coffee',

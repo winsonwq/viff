@@ -198,3 +198,9 @@ describe 'viff', ->
     cases = Viff.constructCases(browsers, @config.compare, @links)
     cases.length.should.equal 6
     _.first(cases).from.name.should.equal 'build'
+
+  it 'should split cases to groups according to amount of instances', () ->
+    cases = Viff.constructCases(@config.browsers, @config.compare, @links)
+    groups = Viff.split cases, 3
+    groups[0].length.should.equal 2
+    groups[1].length.should.equal 1

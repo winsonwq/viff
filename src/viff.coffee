@@ -64,6 +64,13 @@ class Viff extends EventEmitter
 
     cases
 
+  @split: (cases, count) ->
+    groups = []
+    groups.push [] while count--
+    groups[idx % groups.length].push _case for idx, _case of cases
+
+    groups
+
   run: (cases, callback) ->
     defer = Q.defer()
     defer.promise.done callback
@@ -71,14 +78,6 @@ class Viff extends EventEmitter
 
     @emit 'before', cases
     start = Date.now()
-
-    endQueue = (index) ->
-      if index == cases.length - 1
-        endTime = Date.now() - start
-        that.emit 'after', cases, endTime
-        defer.resolve [cases, endTime]
-
-        that.closeDrivers()
 
     async.eachSeries cases, (_case, next) ->
       startcase = Date.now()
