@@ -1,10 +1,13 @@
 phantom = require 'phantom'
 
+canvasDrawPool = []
+
 nope = () ->
 
 class CanvasDrawImage
 
   constructor: () ->
+    @running = false
 
   preparePhantom: (cb) ->
     platform = if process.platform == 'win32' then 'phantomjs.cmd' else 'phantomjs';
@@ -25,13 +28,15 @@ class CanvasDrawImage
     else cb.call(this)
 
   drawImage: (imageDataUrl, location, size, cb) ->
+    @running = true
     @preparePhantom =>
 
       resultDataUrl = ''
-      @cachedPage.set 'onCallback', (data) ->
+      @cachedPage.set 'onCallback', (data) =>
         if data.chunk
           resultDataUrl += data.chunk;
         else if data.done
+          @running = false
           cb resultDataUrl
 
       @cachedPage.evaluate (dataUrl, loc, sz) ->
@@ -62,4 +67,16 @@ class CanvasDrawImage
     @cachedPh.exit()
     @cachedPh = @cachedPage = null
 
-module.exports = new CanvasDrawImage
+module.exports =
+  get: ->
+    canvases = (r for r in canvasDrawPool when r.running isnt true)
+    if canvases[0]?
+      return canvases[0]
+    else
+      c = new CanvasDrawImage()
+      canvasDrawPool.push c
+      return c
+
+  exit: ->
+    for c in canvasDrawPool
+      c.exit()

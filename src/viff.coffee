@@ -127,7 +127,8 @@ class Viff extends EventEmitter
       .then((elem) ->
         Q.all([elem.getLocation(), elem.getSize()]).then ([location, size]) ->
           defer = Q.defer()
-          partialCanvas.drawImage dataUrlHelper.toDataURL(base64Img), location, size, (data) ->
+          cvs = partialCanvas.get()
+          cvs.drawImage dataUrlHelper.toDataURL(base64Img), location, size, (data) ->
             defer.resolve new Buffer(dataUrlHelper.toData(data), 'base64')
 
           defer.promise
