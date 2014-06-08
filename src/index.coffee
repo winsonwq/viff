@@ -11,25 +11,27 @@ config = processArgs process.argv
 
 return console.log config if _.isString config
 
-viff = new Viff config.seleniumHost
-exceptions = []
-
-# clean the images and report.json
-viff.on 'before', (cases) ->
-  imgGen.reset()
-  consoleStatus.logBefore()
-
-# generate images by each case
-viff.on 'afterEach', (_case, duration, fex, tex) ->
-  imgGen.generateByCase _case if duration != 0
-  consoleStatus.logAfterEach _case, duration, fex, tex, exceptions
-
-# generate report.json
-viff.on 'after', (cases, duration) ->
-  imgGen.generateReport cases
-  resemble.exit()
-  partialCanvas.exit()
-  consoleStatus.logAfter cases, duration, exceptions
+count = config.maxInstance ? 1
 
 cases = Viff.constructCases config.browsers, config.envHosts, config.paths
-viff.run cases
+testGroups = Viff.split cases, count
+resolvedCases = []
+exceptions = []
+
+imgGen.reset()
+consoleStatus.logBefore()
+
+for group in testGroups
+  viff = new Viff config.seleniumHost
+
+  viff.on 'afterEach', (_case, duration, fex, tex) ->
+    imgGen.generateByCase _case if duration != 0
+    consoleStatus.logAfterEach _case, duration, fex, tex, exceptions
+
+  viff.run group, ([cases, duration]) ->
+    resolvedCases = resolvedCases.concat cases
+    unless --count
+      imgGen.generateReport resolvedCases
+      resemble.exit()
+      partialCanvas.exit()
+      consoleStatus.logAfter resolvedCases, duration, exceptions

@@ -143,6 +143,8 @@ And integrated `viffclient.post` method in your functional testing code. Check m
 
 # History
 
+2014-06-08 **viff@0.10.x** could use multi viff instances to improve testing performance.
+
 2014-05-18 **viff@0.9.0** finally replace `canvas` by `phantomjs`, so easy installation starts from now, even in Windows System.
 
 2014-03-15 **viff@0.8.2** could setup viff server and wait for screenshots from the place out of viff. Check out the [`viff client`](https://github.com/winsonwq/viff-client) example.
