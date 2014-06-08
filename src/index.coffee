@@ -12,20 +12,24 @@ config = processArgs process.argv
 return console.log config if _.isString config
 
 viff = new Viff config.seleniumHost
-
-consoleStatus viff
+exceptions = []
 
 # clean the images and report.json
-viff.on 'before', (cases) ->  imgGen.reset();
+viff.on 'before', (cases) ->
+  imgGen.reset()
+  consoleStatus.logBefore()
 
 # generate images by each case
-viff.on 'afterEach', (_case, duration) -> imgGen.generateByCase _case if duration != 0
+viff.on 'afterEach', (_case, duration, fex, tex) ->
+  imgGen.generateByCase _case if duration != 0
+  consoleStatus.logAfterEach _case, duration, fex, tex, exceptions
 
 # generate report.json
 viff.on 'after', (cases, duration) ->
   imgGen.generateReport cases
   resemble.exit()
   partialCanvas.exit()
+  consoleStatus.logAfter cases, duration, exceptions
 
 cases = Viff.constructCases config.browsers, config.envHosts, config.paths
 viff.run cases
