@@ -8,6 +8,9 @@ imgGen = require './image.generator'
 Testcase = require './testcase'
 Capability = require './capability'
 require './color.helper.js'
+resemble = require './resemble'
+partialCanvas = require './canvas.drawimage'
+
 
 cases = {}
 resolvedCases = []
@@ -71,6 +74,8 @@ caseHandler = (req, resp) ->
     else if req.url is '/end'
       console.log '  Done.'
       resp.end()
+      resemble.exit()
+      partialCanvas.exit()
       process.exit 0
   else
     resp.end()

@@ -2,6 +2,10 @@
 
 Find virsual differences between web pages in different environments(developing, staging, production) and browsers.
 
+## Video Quick Introduction
+
+[![Viff Demo Video](https://i1.ytimg.com/vi/wu-3tVrspkg/0.jpg)](http://youtu.be/wu-3tVrspkg)
+
 ## Installation
 
 Viff is running on selenium sever. Don't worry, you can easily set up selenium server by using `wdm`.
@@ -16,8 +20,6 @@ Then install `viff` command line.
 npm install -g coffee-script && npm install -g viff
 ```
 No need to install coffee-script if you have.
-
-If you meet issue about `node-canvas`. Have a check [node-canvas wiki](https://github.com/LearnBoost/node-canvas/wiki/Installation---OSX)
 
 ## Examples
 
@@ -73,7 +75,7 @@ module.exports = {
       return browser.maximize();
     }]}
   ],
-  reportFormat: 'file'
+  maxInstance: 3
 };
 ```
 
@@ -144,6 +146,10 @@ $ viffserver
 And integrated `viffclient.post` method in your functional testing code. Check more in [Viff Examples](https://github.com/winsonwq/viff-examples) or [Viff Client](https://github.com/winsonwq/viff-client).
 
 # History
+
+2014-06-08 **viff@0.10.x** could use multi viff instances to improve testing performance (`maxInstance` property).
+
+2014-05-18 **viff@0.9.0** finally replace `canvas` by `phantomjs`, so easy installation starts from now, even in Windows System.
 
 2014-03-15 **viff@0.8.2** could setup viff server and wait for screenshots from the place out of viff. Check out the [`viff client`](https://github.com/winsonwq/viff-client) example.
 
