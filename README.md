@@ -17,9 +17,8 @@ $ wdm update --standalone // install selenium and webdrivers
 Then install `viff` command line.
 
 ```
-npm install -g coffee-script && npm install -g viff
+npm install -g viff
 ```
-No need to install coffee-script if you already have it, of course.
 
 ## Examples
 
@@ -146,6 +145,8 @@ $ viffserver
 And integrated `viffclient.post` method in your functional testing code. Check more in [Viff Examples](https://github.com/winsonwq/viff-examples) or [Viff Client](https://github.com/winsonwq/viff-client).
 
 # History
+
+2014-08-07 **viff@0.10.3** no need to install `coffee-script` before hand.
 
 2014-06-08 **viff@0.10.x** could use multi viff instances to improve testing performance (`maxInstance` property).
 
