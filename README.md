@@ -2,6 +2,8 @@
 
 Find visual differences between web pages in different environments (developing, staging, production) and browsers.
 
+Join discussion in [![Gitter chat](https://badges.gitter.im/winsonwq/viff.png)](https://gitter.im/winsonwq/viff)
+
 ## Video Quick Introduction
 
 [![Viff Demo Video](https://i1.ytimg.com/vi/wu-3tVrspkg/0.jpg)](http://youtu.be/wu-3tVrspkg)
