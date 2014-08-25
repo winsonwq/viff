@@ -103,6 +103,16 @@ describe 'viff', ->
 
     @viff.run Viff.constructCases(@config.browsers, @config.compare, @links), callback
 
+  it 'should throw error when take many screenshots with one failed', (done) ->
+    links = ['/path', ['/something', '#sdfd']]
+    callback = ([cases, endTime]) ->
+      cases.length.should.eql 4
+      _.first(cases).url.should.eql '/path'
+      cases[2].url.should.eql ['/something', '#sdfd']
+      done()
+
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, links), callback
+
   it 'should take fire many times `beforeEach` handler', (done) ->
     beforeEachHandler = sinon.spy()
     @viff.on 'beforeEach', beforeEachHandler
@@ -152,6 +162,14 @@ describe 'viff', ->
     @viff.takeScreenshot 'firefox', 'http://localhost:4000', link, (img) =>
       partialTake.calledWith('base64string', @driver, 'selector').should.be.true
       partialTake.restore()
+      done();
+
+  it 'should throw timeout error when take partial screenshot with wrong option', (done) ->
+    partialCanvas = require '../../lib/canvas.drawimage'
+    cvs = partialCanvas.get()
+
+    cvs.drawImage 'base64string', {x:0,y: 0}, {height: 0, width: 0}, (data) ->
+      data.should.be.equal ''
       done();
 
   it 'should run pre-handler when using selector', (done) ->

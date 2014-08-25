@@ -39,8 +39,7 @@ class Viff extends EventEmitter
       prepromise.then ->
         driver.takeScreenshot((err, base64Img) ->
           if _.isString selector
-            Viff.dealWithPartial(base64Img, driver, selector, defer.resolve)
-              .catch defer.reject
+            Viff.dealWithPartial(base64Img, driver, selector, defer.resolve, defer.reject)
           else
             defer.resolve new Buffer(base64Img, 'base64')
           )
@@ -85,23 +84,25 @@ class Viff extends EventEmitter
 
       compareFrom = that.takeScreenshot _case.from.capability, _case.from.host, _case.url
       Q.allSettled([compareFrom]).then ([fs]) ->
+        if fs.state != "fulfilled"
+          that.emit 'afterEach', _case, 0, fs.reason, fs.reason
+          next()
+        else
+          compareTo = that.takeScreenshot _case.to.capability, _case.to.host, _case.url
+          Q.allSettled([compareTo]).then ([ts]) ->
 
-        compareTo = that.takeScreenshot _case.to.capability, _case.to.host, _case.url
-        Q.allSettled([compareTo]).then ([ts]) ->
-
-          if fs.reason or ts.reason
-            that.emit 'afterEach', _case, 0, fs.reason, ts.reason
-            next()
-          else
-            Viff.runCase(_case, fs.value, ts.value).then (c) ->
-              that.emit 'afterEach', _case, Date.now() - startcase, fs.reason, ts.reason
+            if ts.state != "fulfilled"
+              that.emit 'afterEach', _case, 0, fs.reason, ts.reason
               next()
+            else
+              Viff.runCase(_case, fs.value, ts.value).then (c) ->
+                that.emit 'afterEach', _case, Date.now() - startcase, fs.reason, ts.reason
+                next()
 
     , (err) ->
       endTime = Date.now() - start
       that.emit 'after', cases, endTime
       defer.resolve [cases, endTime]
-
       that.closeDrivers()
 
     defer.promise
@@ -121,7 +122,10 @@ class Viff extends EventEmitter
   closeDrivers: () ->
     @drivers[browser].quit() for browser of @drivers
 
-  @dealWithPartial: (base64Img, driver, selector, callback) ->
+  @dealWithPartial: (base64Img, driver, selector, resolve, reject) ->
+    if !driver.elementByCss
+      reject()
+      return driver
     driver.elementByCss(selector)
       .then((elem) ->
         Q.all([elem.getLocation(), elem.getSize()]).then ([location, size]) ->
@@ -132,6 +136,6 @@ class Viff extends EventEmitter
 
           defer.promise
       )
-      .then callback
+      .then resolve
 
 module.exports = Viff

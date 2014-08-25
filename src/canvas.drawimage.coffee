@@ -30,15 +30,22 @@ class CanvasDrawImage
   drawImage: (imageDataUrl, location, size, cb) ->
     @running = true
     @preparePhantom =>
-
+      timeout = setTimeout () ->
+        cb ''
+      , 10000
       resultDataUrl = ''
       @cachedPage.set 'onCallback', (data) =>
         if data.chunk
           resultDataUrl += data.chunk;
         else if data.done
+          #set a timeout of 10s
+          clearTimeout timeout
           @running = false
           cb resultDataUrl
-
+        else
+          clearTimeout
+          @running = false
+          cb ''
       @cachedPage.evaluate (dataUrl, loc, sz) ->
         image = new Image()
         image.onload = ->
@@ -52,16 +59,19 @@ class CanvasDrawImage
             dataUrl = cvs.toDataURL()
             i = 0
 
-            while i < dataUrl.length
-              window.callPhantom { chunk : dataUrl.slice(i, i + 1024) }
-              i+= 1024
+            if dataUrl && dataUrl.length
+              while i < dataUrl.length
+                window.callPhantom { chunk : dataUrl.slice(i, i + 1024) }
+                i+= 1024
+            else
+              window.callPhantom { done: false }
+              return
 
             window.callPhantom { done: true }
 
-        image.src = dataUrl
+        image.src = dataUrl || ''
 
       , nope, imageDataUrl, location, size
-
 
   exit: () ->
     @cachedPh.exit()
