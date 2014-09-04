@@ -78,9 +78,11 @@ describe 'viff', ->
   it 'should use correct path when set pre handler', (done) ->
     links = [['/404.html', (driver, webdriver) -> ]]
     callback = ([cases, endTime]) ->
+      console.log 'callback run'
       _.first(cases).url[0].should.eql '/404.html'
       done()
-    @viff.run Viff.constructCases(@config.browsers, @config.compare, links), callback
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, links)
+    .then callback
 
   it 'should use correct path string when set selector', (done) ->
     links = [['/404.html', '#page', (driver, webdriver) -> ]]
@@ -92,7 +94,8 @@ describe 'viff', ->
       dealWithPartial.restore()
       done()
 
-    @viff.run Viff.constructCases(@config.browsers, @config.compare, links), callback
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, links)
+    .then callback
 
   it 'should take many screenshots according to config', (done) ->
 
@@ -101,7 +104,8 @@ describe 'viff', ->
       _.first(cases).url.should.eql '/404.html'
       done()
 
-    @viff.run Viff.constructCases(@config.browsers, @config.compare, @links), callback
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, @links)
+    .then callback
 
   it 'should throw error when take many screenshots with one failed', (done) ->
     links = ['/path', ['/something', '#sdfd']]
@@ -111,7 +115,8 @@ describe 'viff', ->
       cases[2].url.should.eql ['/something', '#sdfd']
       done()
 
-    @viff.run Viff.constructCases(@config.browsers, @config.compare, links), callback
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, links)
+    .then callback
 
   it 'should take fire many times `beforeEach` handler', (done) ->
     beforeEachHandler = sinon.spy()
@@ -121,7 +126,8 @@ describe 'viff', ->
       beforeEachHandler.callCount.should.eql 4
       done()
 
-    @viff.run Viff.constructCases(@config.browsers, @config.compare, @links), callback
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, @links)
+    .then callback
 
   it 'should take fire many times `afterEach` handler', (done) ->
     afterEachHandler = sinon.spy()
@@ -131,7 +137,8 @@ describe 'viff', ->
       afterEachHandler.callCount.should.eql 4
       done()
 
-    @viff.run Viff.constructCases(@config.browsers, @config.compare, @links), callback
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, @links)
+    .then callback
 
   it 'should take fire only once `before` handler', (done) ->
     beforeHandler = sinon.spy()
@@ -141,7 +148,8 @@ describe 'viff', ->
       beforeHandler.callCount.should.eql 1
       done()
 
-    @viff.run Viff.constructCases(@config.browsers, @config.compare, @links), callback
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, @links)
+    .then callback
 
   it 'should take fire only once `after` handler', (done) ->
     beforeHandler = sinon.spy()
@@ -151,7 +159,8 @@ describe 'viff', ->
       beforeHandler.callCount.should.eql 1
       done()
 
-    @viff.run Viff.constructCases(@config.browsers, @config.compare, @links), callback
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, @links)
+    .then callback
 
   it 'should take partial screenshot according to selecor', (done) ->
 
@@ -163,15 +172,7 @@ describe 'viff', ->
       partialTake.calledWith('base64string', @driver, 'selector').should.be.true
       partialTake.restore()
       done();
-
-  it 'should throw timeout error when take partial screenshot with wrong option', (done) ->
-    partialCanvas = require '../../lib/canvas.drawimage'
-    cvs = partialCanvas.get()
-
-    cvs.drawImage 'base64string', {x:0,y: 0}, {height: 0, width: 0}, (data) ->
-      data.should.be.equal ''
-      done();
-
+      
   it 'should run pre-handler when using selector', (done) ->
 
     preHandler = sinon.spy()
@@ -190,21 +191,24 @@ describe 'viff', ->
       c.browser.should.eql 'safari'
       c.url.should.eql '/404.html'
 
-    @viff.run Viff.constructCases(@config.browsers, @config.compare, links), -> done()
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, links)
+    .then -> done()
 
   it 'should fire testcase `before` hook', (done) ->
     links = ['/404.html']
     @viff.once 'before', (cases) ->
       cases.length.should.eql 2
 
-    @viff.run Viff.constructCases(@config.browsers, @config.compare, links), -> done()
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, links)
+    .then -> done()
 
   it 'should fire testcase `after` hook', (done) ->
     links = ['/404.html']
     @viff.once 'after', (cases) ->
       cases.length.should.eql 2
 
-    @viff.run Viff.constructCases(@config.browsers, @config.compare, links), -> done()
+    @viff.run Viff.constructCases(@config.browsers, @config.compare, links)
+    .then -> done()
 
   it 'should construct cases', () ->
     cases = Viff.constructCases(@config.browsers, @config.compare, @links)

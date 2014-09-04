@@ -18,17 +18,18 @@ testGroups = Viff.split cases, count
 resolvedCases = []
 exceptions = []
 
-imgGen.reset()
+# imgGen.reset()
 consoleStatus.logBefore()
 
 for group in testGroups
   viff = new Viff config.seleniumHost
 
   viff.on 'afterEach', (_case, duration, fex, tex) ->
-    imgGen.generateByCase _case if duration != 0
     consoleStatus.logAfterEach _case, duration, fex, tex, exceptions
 
-  viff.run group, ([cases, duration]) ->
+  viff
+  .run group
+  .done ([cases, duration]) ->
     resolvedCases = resolvedCases.concat cases
     unless --count
       imgGen.generateReport resolvedCases

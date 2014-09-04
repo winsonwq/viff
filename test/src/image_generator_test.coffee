@@ -71,4 +71,3 @@ module.exports =
     test.equals @writeFileSync.callCount, 3
     test.ok @writeFileSync.firstCall.args[0].indexOf('/viff/screenshots/firefox-safari/build%3A%2Flink1/firefox-build.png') >= 0
     test.done()
-
