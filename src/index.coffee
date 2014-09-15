@@ -18,7 +18,7 @@ testGroups = Viff.split cases, count
 resolvedCases = []
 exceptions = []
 
-imgGen.reset()
+imgGen.reset(config.basePath)
 consoleStatus.logBefore()
 
 for group in testGroups

@@ -6,11 +6,21 @@ wrench = require 'wrench'
 
 Viff = require './viff'
 
-preprocessFolderName = (_case) -> encodeURIComponent _case.key()
-
-currentRunningDirname = process.cwd()
+currentRunningDirname = path.join process.cwd()
 screenshotPath = path.join currentRunningDirname, './screenshots'
 reportJsonPath = path.join currentRunningDirname, './report.json'
+
+preprocessFolderName = (_case) -> encodeURIComponent _case.key()
+resetBasePath = (_base) ->
+  if _base
+    currentRunningDirname = path.join process.cwd(), _base
+    wrench.mkdirSyncRecursive currentRunningDirname if !fs.existsSync process.cwd()
+  else
+    currentRunningDirname = process.cwd()
+  screenshotPath = path.join currentRunningDirname, './screenshots'
+  reportJsonPath = path.join currentRunningDirname, './report.json'
+
+resetBasePath()
 
 events = 
   CREATE_FOLDER: 'createFolder'
@@ -40,7 +50,9 @@ _.extend ImageGenerator,
     fs.writeFileSync reportJsonPath, JSON.stringify reportObj
     ImageGenerator.emit ImageGenerator.CREATE_FILE, reportJsonPath
 
-  reset: -> ImageGenerator.resetFolderAndFile screenshotPath, reportJsonPath
+  reset: (_base) -> 
+    resetBasePath(_base)
+    ImageGenerator.resetFolderAndFile screenshotPath, reportJsonPath
 
   generateByCase: (_case) ->
     browserFolderPath = path.join screenshotPath, _case.browser
