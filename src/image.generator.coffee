@@ -20,7 +20,7 @@ resetBasePath = (_base) ->
   screenshotPath = path.join currentRunningDirname, './screenshots'
   reportJsonPath = path.join currentRunningDirname, './report.json'
 
-resetBasePath()
+# resetBasePath()
 
 events = 
   CREATE_FOLDER: 'createFolder'

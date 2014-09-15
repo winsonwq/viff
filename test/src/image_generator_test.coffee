@@ -30,6 +30,13 @@ module.exports =
     ]
     callback()
 
+  'it could create a base path': (test) ->
+    @existsSync = @existsSync.returns false
+
+    ImageGenerator.reset 'sample'
+    test.ok @mkdirSyncRecursive.firstCall.args[0].indexOf('/sample') >= 0
+    test.done()
+
   'it could generate images by case': (test) ->
     c = new Case('firefox', 'firefox', 'http://localhost:4000', 'http://localhost:4001', 'build', 'prod', '/link1')
     c.result = 
