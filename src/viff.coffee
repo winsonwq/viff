@@ -33,7 +33,8 @@ class Viff extends EventEmitter
       driver.get(host + parsedUrl).then ->
         new Promise (res, rej) ->
           if _.isFunction preHandle
-            preHandle driver, wd (err) -> 
+            preHandle driver, wd
+            .then (err) -> 
               if err then rej() else res()
           else
             res()
@@ -82,25 +83,31 @@ class Viff extends EventEmitter
       that.emit 'before', cases
       start = Date.now()
 
-      Promise.map cases, (_case) ->
+      Promise
+      .map cases, (_case) ->
         new Promise (res, rej) ->
           startcase = Date.now()
           that.emit 'beforeEach', _case, 0
-          compareFrom = that.takeScreenshot _case.from.capability, _case.from.host, _case.url
-          Promise.all([compareFrom]).then ([fs]) ->
-            if fs.state != "fulfilled"
-              that.runAfterCase _case, 0, fs.reason, fs.reason
-                .then rej            
+          that
+          .takeScreenshot _case.from.capability, _case.from.host, _case.url
+          .then (fs) ->
+            if !fs
+              that
+              .runAfterCase _case, 0
+              .then rej
             else
-              compareTo = that.takeScreenshot _case.to.capability, _case.to.host, _case.url
-              Promise.all([compareTo]).then ([ts]) ->
-                if ts.state != "fulfilled"
-                  that.runAfterCase _case, 0, fs.reason, ts.reason
-                    .then rej                
+              that
+              .takeScreenshot _case.to.capability, _case.to.host, _case.url
+              .then (ts) ->
+                if !ts
+                  that
+                  .runAfterCase _case, 0
+                  .then rej
                 else
-                  Viff.runCase(_case, fs.value, ts.value).then (c) ->
-                    that.runAfterCase _case, Date.now() - startcase, fs.reason, ts.reason
-                      .then res
+                  Viff.runCase(_case, fs, ts).then (c) ->
+                    that
+                    .runAfterCase _case, Date.now() - startcase
+                    .then res
       .finally ->
         endTime = Date.now() - start
         that.emit 'after', cases, endTime

@@ -128,7 +128,6 @@ _.extend ImageGenerator,
     _.each cases, (_case) ->
       if _case.result
         compares[_case.browser] = compares[_case.browser] || {}
-        console.log _case.result.images
         compares[_case.browser][_case.key()] = _case.result
 
         differences.push _case if _case.result.misMatchPercentage isnt 0
