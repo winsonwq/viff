@@ -9,6 +9,8 @@ cairo.tar.xz
 /lib/
 /test/build/
 /tmp/
+/old
+/sample
 /pkg-config-0.23/
 /pixman-0.22.0/
 /cairo-1.12.8/

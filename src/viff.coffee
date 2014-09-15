@@ -3,6 +3,7 @@ util = require 'util'
 {EventEmitter} = require 'events'
 
 Q = require 'q'
+Promise = require 'bluebird'
 async = require 'async'
 wd = require 'wd'
 Comparison = require './comparison'
@@ -10,6 +11,8 @@ Testcase = require './testcase'
 Capability = require './capability'
 partialCanvas = require './canvas.drawimage'
 dataUrlHelper = require './image.dataurl.helper'
+imgGen = require './image.generator'
+gm = require 'gm'
 
 class Viff extends EventEmitter
   constructor: (seleniumHost) ->
@@ -20,33 +23,29 @@ class Viff extends EventEmitter
 
   takeScreenshot: (capability, host, url, callback) ->
     that = @
-    defer = Q.defer()
-    defer.promise.then callback
+    new Promise (resolve, reject) ->
+      capability = new Capability capability
+      unless driver = that.drivers[capability.key()]
+        that.drivers[capability.key()] = driver = that.builder.init capability
 
-    capability = new Capability capability
-    unless driver = @drivers[capability.key()]
-      @drivers[capability.key()] = driver = @builder.init capability
+      [parsedUrl, selector, preHandle] = Testcase.parseUrl url
 
-    [parsedUrl, selector, preHandle] = Testcase.parseUrl url
-
-    driver.get(host + parsedUrl).then ->
-
-      if _.isFunction preHandle
-        prepromise = Q.fcall () -> preHandle driver, wd
-      else
-        prepromise = Q()
-
-      prepromise.then ->
-        driver.takeScreenshot((err, base64Img) ->
-          if _.isString selector
-            Viff.dealWithPartial(base64Img, driver, selector, defer.resolve)
-              .catch defer.reject
+      driver.get(host + parsedUrl).then ->
+        new Promise (res, rej) ->
+          if _.isFunction preHandle
+            preHandle driver, wd
+            .then (err) -> 
+              if err then rej() else res()
           else
-            defer.resolve new Buffer(base64Img, 'base64')
-          )
-          .catch defer.reject
-
-    defer.promise
+            res()
+        .then ->
+          driver.takeScreenshot((err, base64Img) ->
+            if _.isString selector
+              Viff.dealWithPartial(base64Img, driver, selector, resolve, reject)
+            else
+              resolve new Buffer(base64Img, 'base64')
+            )
+            .catch reject
 
   @constructCases: (capabilities, envHosts, links) ->
     cases = []
@@ -71,40 +70,49 @@ class Viff extends EventEmitter
 
     groups
 
+  runAfterCase: (_case, duration, fex, tex) ->
+    @emit 'afterEach', _case, duration, fex, tex
+    if duration != 0 then imgGen.generateByCase _case else imgGen.generateFailedCase _case
+
   run: (cases, callback) ->
-    defer = Q.defer()
-    defer.promise.done callback
-    that = this
+    that = @
+    new Promise (resolve, reject) ->
+      if callback
+        @finally callback
 
-    @emit 'before', cases
-    start = Date.now()
+      that.emit 'before', cases
+      start = Date.now()
 
-    async.eachSeries cases, (_case, next) ->
-      startcase = Date.now()
-      that.emit 'beforeEach', _case, 0
-
-      compareFrom = that.takeScreenshot _case.from.capability, _case.from.host, _case.url
-      Q.allSettled([compareFrom]).then ([fs]) ->
-
-        compareTo = that.takeScreenshot _case.to.capability, _case.to.host, _case.url
-        Q.allSettled([compareTo]).then ([ts]) ->
-
-          if fs.reason or ts.reason
-            that.emit 'afterEach', _case, 0, fs.reason, ts.reason
-            next()
-          else
-            Viff.runCase(_case, fs.value, ts.value).then (c) ->
-              that.emit 'afterEach', _case, Date.now() - startcase, fs.reason, ts.reason
-              next()
-
-    , (err) ->
-      endTime = Date.now() - start
-      that.emit 'after', cases, endTime
-      defer.resolve [cases, endTime]
-
-      that.closeDrivers()
-
-    defer.promise
+      Promise
+      .map cases, (_case) ->
+        new Promise (res, rej) ->
+          startcase = Date.now()
+          that.emit 'beforeEach', _case, 0
+          that
+          .takeScreenshot _case.from.capability, _case.from.host, _case.url
+          .then (fs) ->
+            if !fs
+              that
+              .runAfterCase _case, 0
+              .then rej
+            else
+              that
+              .takeScreenshot _case.to.capability, _case.to.host, _case.url
+              .then (ts) ->
+                if !ts
+                  that
+                  .runAfterCase _case, 0
+                  .then rej
+                else
+                  Viff.runCase(_case, fs, ts).then (c) ->
+                    that
+                    .runAfterCase _case, Date.now() - startcase
+                    .then res
+      .finally ->
+        endTime = Date.now() - start
+        that.emit 'after', cases, endTime
+        resolve [cases, endTime]
+        that.closeDrivers()
 
   @runCase: (_case, fromImage, toImage, callback) ->
     imgWithEnvs = _.object [[_case.from.capability.key() + '-' + _case.from.name, fromImage], [_case.to.capability.key() + '-' + _case.to.name, toImage]]
@@ -121,17 +129,21 @@ class Viff extends EventEmitter
   closeDrivers: () ->
     @drivers[browser].quit() for browser of @drivers
 
-  @dealWithPartial: (base64Img, driver, selector, callback) ->
+  @dealWithPartial: (base64Img, driver, selector, resolve, reject) ->
+    if !driver.elementByCss
+      reject()
+      return driver
     driver.elementByCss(selector)
       .then((elem) ->
-        Q.all([elem.getLocation(), elem.getSize()]).then ([location, size]) ->
-          defer = Q.defer()
-          cvs = partialCanvas.get()
-          cvs.drawImage dataUrlHelper.toDataURL(base64Img), location, size, (data) ->
-            defer.resolve new Buffer(dataUrlHelper.toData(data), 'base64')
-
-          defer.promise
+        Promise.all([elem.getLocation(), elem.getSize()]).then ([location, size]) ->
+          new Promise (res, rej) ->
+            try
+              cvs = partialCanvas.get()
+              cvs.drawImage dataUrlHelper.toDataURL(base64Img), location, size, (data) ->
+                res new Buffer(dataUrlHelper.toData(data), 'base64')
+            catch e
+              rej()
       )
-      .then callback
+      .then resolve
 
 module.exports = Viff
