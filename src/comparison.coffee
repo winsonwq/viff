@@ -35,7 +35,7 @@ class Comparison
   @compare: (fileAData, fileBData, callback) ->
     defer = Q.defer()
     promise = defer.promise.then callback
-
+    if !fileAData && !fileBData then defer.resolve {}
     r = resemble.get()
     r.running = true
     r.compare dataUrlHelper.toDataURL(fileAData), dataUrlHelper.toDataURL(fileBData), (data) ->

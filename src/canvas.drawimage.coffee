@@ -38,6 +38,11 @@ class CanvasDrawImage
         else if data.done
           @running = false
           cb resultDataUrl
+        else if data.error
+          @running = false
+          cb ''
+      @cachedPage.set 'onError', (err) =>
+        cb ''
 
       @cachedPage.evaluate (dataUrl, loc, sz) ->
         image = new Image()
@@ -61,7 +66,6 @@ class CanvasDrawImage
         image.src = dataUrl
 
       , nope, imageDataUrl, location, size
-
 
   exit: () ->
     @cachedPh.exit()
