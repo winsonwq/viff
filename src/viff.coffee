@@ -73,7 +73,7 @@ class Viff extends EventEmitter
 
   run: (cases, callback) ->
     defer = Q.defer()
-    defer.promise.done callback
+    defer.promise.then callback
     that = this
 
     @emit 'before', cases
