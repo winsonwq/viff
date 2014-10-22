@@ -30,6 +30,13 @@ module.exports =
     ]
     callback()
 
+  'it could create a base path': (test) ->
+    @existsSync = @existsSync.returns false
+
+    ImageGenerator.reset 'sample'
+    test.ok @mkdirSyncRecursive.firstCall.args[0].indexOf('/sample') >= 0
+    test.done()
+
   'it could generate images by case': (test) ->
     c = new Case('firefox', 'firefox', 'http://localhost:4000', 'http://localhost:4001', 'build', 'prod', '/link1')
     c.result = 
@@ -45,10 +52,10 @@ module.exports =
 
     ImageGenerator.generateByCase c
 
-    test.ok @mkdirSync.firstCall.args[0].indexOf('/viff/screenshots/firefox') >= 0
-    test.ok @mkdirSync.secondCall.args[0].indexOf('/viff/screenshots/firefox/%2Flink1') >= 0
+    test.ok @mkdirSync.firstCall.args[0].indexOf('/screenshots/firefox') >= 0
+    test.ok @mkdirSync.secondCall.args[0].indexOf('/screenshots/firefox/%2Flink1') >= 0
     test.equals @writeFileSync.callCount, 3
-    test.ok @writeFileSync.firstCall.args[0].indexOf('/viff/screenshots/firefox/%2Flink1/build.png') >= 0
+    test.ok @writeFileSync.firstCall.args[0].indexOf('/screenshots/firefox/%2Flink1/build.png') >= 0
     test.done()
 
   'it could generate images by case when comparing cross browsers': (test) ->
@@ -66,9 +73,9 @@ module.exports =
 
     ImageGenerator.generateByCase c
 
-    test.ok @mkdirSync.firstCall.args[0].indexOf('/viff/screenshots/firefox-safari') >= 0
-    test.ok @mkdirSync.secondCall.args[0].indexOf('/viff/screenshots/firefox-safari/build%3A%2Flink1') >= 0
+    test.ok @mkdirSync.firstCall.args[0].indexOf('/screenshots/firefox-safari') >= 0
+    test.ok @mkdirSync.secondCall.args[0].indexOf('/screenshots/firefox-safari/build%3A%2Flink1') >= 0
     test.equals @writeFileSync.callCount, 3
-    test.ok @writeFileSync.firstCall.args[0].indexOf('/viff/screenshots/firefox-safari/build%3A%2Flink1/firefox-build.png') >= 0
+    test.ok @writeFileSync.firstCall.args[0].indexOf('/screenshots/firefox-safari/build%3A%2Flink1/firefox-build.png') >= 0
     test.done()
 

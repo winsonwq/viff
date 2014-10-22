@@ -59,7 +59,7 @@
     "viffserver": "./bin/viffserver"
   },
   "scripts": {
-    "build": "node_modules/coffee-script/bin/cake build",
+    "build": "cake build",
     "install": "npm run build",
     "test": "npm install && grunt default"
   }
