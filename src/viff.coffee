@@ -88,14 +88,17 @@ class Viff extends EventEmitter
 
         compareTo = that.takeScreenshot _case.to.capability, _case.to.host, _case.url
         Q.allSettled([compareTo]).then ([ts]) ->
-
           if fs.reason or ts.reason
             that.emit 'afterEach', _case, 0, fs.reason, ts.reason
             next()
-          else
+          else if fs.value and ts.value
             Viff.runCase(_case, fs.value, ts.value).then (c) ->
               that.emit 'afterEach', _case, Date.now() - startcase, fs.reason, ts.reason
               next()
+          else
+            that.emit 'afterEach', _case, 0, fs.reason, ts.reason
+            next()
+
 
     , (err) ->
       endTime = Date.now() - start
@@ -123,15 +126,15 @@ class Viff extends EventEmitter
 
   @dealWithPartial: (base64Img, driver, selector, callback) ->
     driver.elementByCss(selector)
-      .then((elem) ->
-        Q.all([elem.getLocation(), elem.getSize()]).then ([location, size]) ->
-          defer = Q.defer()
-          cvs = partialCanvas.get()
-          cvs.drawImage dataUrlHelper.toDataURL(base64Img), location, size, (data) ->
+    .then (elem) ->
+      Q.all([elem.getLocation(), elem.getSize()]).then ([location, size]) ->
+        defer = Q.defer()
+        cvs = partialCanvas.get()
+        cvs.drawImage dataUrlHelper.toDataURL(base64Img), location, size, (data) ->
+          if data
             defer.resolve new Buffer(dataUrlHelper.toData(data), 'base64')
-
-          defer.promise
-      )
-      .then callback
+          else defer.resolve ''
+        defer.promise
+    .then callback
 
 module.exports = Viff
