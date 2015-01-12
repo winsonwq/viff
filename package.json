@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/windonwq/viff.git"
+    "url": "git://github.com/winsonwq/viff.git"
   },
   "bugs": {
-    "url": "https://github.com/windonwq/viff/issues"
+    "url": "https://github.com/winsonwq/viff/issues"
   },
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/windonwq/viff/blob/master/LICENSE-MIT"
+      "url": "https://github.com/winsonwq/viff/blob/master/LICENSE-MIT"
     }
   ],
   "main": "lib/viff.js",
